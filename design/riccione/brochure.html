@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  margin: 0;
+  padding: 20px;
+  background: #f0f0f0;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.brochure {
+  width: 210mm;
+  height: 297mm;
+  background: #0A0A0A;
+  color: #FFFFFF;
+  padding: 40px;
+  box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.header {
+  text-align: center;
+  border-bottom: 2px solid #8B00FF;
+  padding-bottom: 20px;
+}
+h1 {
+  font-size: 36px;
+  color: #FF6600;
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+}
+.sub {
+  font-size: 18px;
+  color: #8B00FF;
+  margin: 5px 0;
+}
+.content {
+  flex: 1;
+  padding: 20px 0;
+}
+.section {
+  margin: 15px 0;
+}
+.section-title {
+  color: #8B00FF;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.section-text {
+  color: #C0C0C0;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 5px 0;
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 15px 0;
+}
+.feature-item {
+  background: #1A1A1A;
+  padding: 10px;
+  border-radius: 8px;
+  border-left: 3px solid #FF6600;
+  font-size: 13px;
+  color: #C0C0C0;
+}
+.footer-brochure {
+  border-top: 1px solid #333;
+  padding-top: 20px;
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+}
+.xmr-highlight {
+  color: #FF6600;
+  font-weight: 700;
+}
+</style>
+</head>
+<body>
+<div class="brochure">
+  <div class="header">
+    <h1>⚡ TAZ DAY</h1>
+    <div class="sub">MyZubster x Riccione</div>
+    <div style="font-size:14px; color:#C0C0C0;">Settembre 2026 · Piazza Riccione</div>
+  </div>
+
+  <div class="content">
+    <div class="section">
+      <div class="section-title">🌱 Cos'è MyZubster</div>
+      <div class="section-text">
+        Ecosistema open source che unisce robotica, blockchain e comunità.
+        Pagamenti esclusivamente in <span class="xmr-highlight">XMR (Monero)</span>.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🤖 Cosa vedrai</div>
+      <div class="features-grid">
+        <div class="feature-item">🤖 <strong>Fluffypony</strong><br>Bar robotico XMR</div>
+        <div class="feature-item">🌱 <strong>Hera Anthea</strong><br>Scambio semi DAO</div>
+        <div class="feature-item">🎤 <strong>Talk</strong><br>TAZ nel 2026</div>
+        <div class="feature-item">💰 <strong>XMR</strong><br>Pagamenti privati</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">📌 Partecipa</div>
+      <div class="section-text">
+        <strong>1.</strong> CLAIM — Commenta su GitHub<br>
+        <strong>2.</strong> CODE — Crea il codice<br>
+        <strong>3.</strong> PR — Apri una Pull Request<br>
+        <strong>4.</strong> PAY — Ricevi XMR
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💰 Bounty Attivi</div>
+      <div class="section-text">
+        <span class="xmr-highlight">50 XMR</span> Referente Comune<br>
+        <span class="xmr-highlight">30 XMR</span> Demo Fluffypony<br>
+        <span class="xmr-highlight">20 XMR</span> Kit Grafico
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-brochure">
+    #MyZubster #TAZ #XMR #OpenSource #Riccione<br>
+    github.com/DanielIoni-creator/I-ECO-01
+  </div>
+</div>
+</body>
+</html>
