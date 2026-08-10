@@ -1,10 +1,17 @@
 # Manuale di Sicurezza - Fluffypony Demo
 
 ## Requisiti di sicurezza
+<<<<<<< HEAD
 1. Alimentazione: Verificare che il robot sia collegato a una presa con messa a terra
 2. Liquidi: Utilizzare solo liquidi alimentari e non infiammabili
 3. Laser: Non puntare mai i LED laser verso persone o animali
 4. Pulizia: Sanificare le pompe prima e dopo ogni utilizzo
+=======
+1. **Alimentazione**: Verificare che il robot sia collegato a una presa con messa a terra
+2. **Liquidi**: Utilizzare solo liquidi alimentari e non infiammabili
+3. **Laser**: Non puntare mai i LED laser verso persone o animali
+4. **Pulizia**: Sanificare le pompe prima e dopo ogni utilizzo
+>>>>>>> e542862 (feat: add safety manual per Fluffypony demo #39)
 
 ## Procedura di emergenza
 1. Premere il pulsante di emergenza rosso
