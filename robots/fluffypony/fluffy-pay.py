@@ -39,4 +39,3 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         GPIO.cleanup()
-# v2.0 - Aggiornamento per PR #29
