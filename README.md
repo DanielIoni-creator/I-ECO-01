@@ -1,28 +1,20 @@
-# MYZUBSTER ECOSYSTEM v1.0
-Collettivo Open Source. No Capi. Pagamenti in XMR.
+# I-ECO-01 | MYZUBSTER ECOSYSTEM v1.0
+Ecosystem Open Source per Collettivi. No capi. Pagamenti in XMR.
 
 ## 15 BOUNTY ATTIVE
-Robot, AI, TAZ, Wallet, Bot. Check Issues tab.
+Robot, AI, TAZ, Wallet, Bot. Check tab Issues.
 
-## COME ENTRARE
-1. CLAIM: Commenta "CLAIM #N" 
-2. CODE: Push su branch `solve-issue-N`
-3. PR: "Solves #N"
-4. PAY: XMR in 24h al merge
+## COME PARTECIPARE
+1.  **CLAIM**: Commenta "CLAIM #N" sull'issue
+2.  **CODE**: Fai branch `solve-issue-N` 
+3.  **PR**: "Solves #N"
+4.  **PAY**: XMR in 24h al merge
 
-## REGOLE
-1. Open Source
-2. XMR Only 
-3. No gerarchie
+## REGOLE ECOSYSTEM
+1.  Codice Open
+2.  XMR Only
+3.  No gerarchie
+4.  Trasparenza totale
 
-Built by: @DanielIoni-creator
-## 📋 COME CONTRIBUIRE
-1. Vedi le issue con label `good-first-issue` o `bounty`
-2. Commenta `/claim @DanielIoni-creator` per prenderla
-3. Leggi la guida: [ONBOARDING.md](docs/ONBOARDING.md)
-4. Fai una PR e guadagna XMR!
-
-## 📊 STATO ATTUALE
-- **Bounty attivi:** 7
-- **Task aperti:** 8
-- **XMR in palio:** ~23 XMR
+Built by @DanielIoni-creator | Rimini
+Wallet Donazioni XMR: `45M4DW1ug8bdQowWpxucTpgsfjLbVxbYaAra79VewmBobuuhgqTjyD4R3DzpqLM2veiphcB16n24qN1QbLg3y2PYGK3Qkoe`

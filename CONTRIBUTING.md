@@ -1,4 +1,12 @@
-# CONTRIBUTING
-Ogni bounty si paga in XMR. 
-Per claimare: commenta sull'issue. 
-Per chiudere: PR che dice "Solves #N"
+# CONTRIBUTING TO I-ECO-01
+
+## Processo Bounty
+Ogni issue ha una bounty in XMR. Al merge paghiamo.
+
+## Struttura Repo
+`/robots` - Hardware Open
+`/wallet` - XMR Tools  
+`/bots` - Flytek Bot
+`/docs` - Guide TAZ
+`/contracts` - Smart Contracts
+`/visual` - AI Templates
