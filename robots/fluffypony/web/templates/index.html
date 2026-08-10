@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fluffypony Laser Robot</title>
+    <style>
+        body { background: #0A0A0A; color: #fff; font-family: 'Arial', sans-serif; text-align: center; padding: 40px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { color: #8B00FF; font-size: 3em; }
+        .status { color: #8B00FF; font-size: 1.5em; }
+        .button { background: #8B00FF; color: #fff; border: none; padding: 15px 30px; border-radius: 10px; margin: 10px; cursor: pointer; }
+        .button:hover { background: #6B00FF; }
+        .laser { background: #FF0000; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Fluffypony Laser</h1>
+        <p class="status">Stato: <span id="status">idle</span></p>
+        <p>🍹 Drink serviti: <span id="drinks">0</span></p>
+        <p>💰 XMR incassati: <span id="xmr">0.0000</span> XMR</p>
+        
+        <div>
+            <button class="button" onclick="serve('mojito')">🍹 Mojito</button>
+            <button class="button" onclick="serve('martini')">🍸 Martini</button>
+            <button class="button" onclick="serve('whiskey')">🥃 Whiskey</button>
+            <button class="button laser" onclick="laser()">🔴 Laser</button>
+        </div>
+        
+        <p style="margin-top: 40px; color: #666;">Powered by MyZubster</p>
+    </div>
+    
+    <script>
+        function serve(drink) {
+            fetch(`/api/serve/${drink}`).then(r => r.json()).then(data => {
+                updateStatus();
+            });
+        }
+        
+        function laser() {
+            fetch('/api/laser').then(r => r.json()).then(() => {
+                updateStatus();
+            });
+        }
+        
+        function updateStatus() {
+            fetch('/api/status').then(r => r.json()).then(data => {
+                document.getElementById('status').textContent = data.status;
+                document.getElementById('drinks').textContent = data.drinks_served;
+                document.getElementById('xmr').textContent = data.xmr_earned.toFixed(4);
+            });
+        }
+        
+        setInterval(updateStatus, 2000);
+        updateStatus();
+    </script>
+</body>
+</html>
