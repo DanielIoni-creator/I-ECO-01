@@ -28,3 +28,8 @@ Ecosystem Open Source per Collettivi. No capi. Pagamenti in XMR.
 
 **Built by @DanielIoni-creator | Rimini**
 **Donazioni XMR:** `45M4DW1ug8bdQowWpxucTpgsfjLbVxbYaAra79VewmBobuuhgqTjyD4R3DzpqLM2veiphcB16n24qN1QbLg3y2PYGK3Qkoe`
+
+## 📚 Risorse Esterne
+
+### Sicurezza Android
+- **[Android Security Teryaagh](docs/resources/android-security.md)** - Repository completo sulla sicurezza Android, con roadmap, laboratori, strumenti e best practices.
