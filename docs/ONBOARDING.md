@@ -5,7 +5,7 @@ Vai su: https://github.com/DanielIoni-creator/I-ECO-01/issues
 Cerca i label: `bounty` o `good-first-issue`
 
 ## 2. Claima l'issue
-Commenta: `/claim @DanielIoni-creator`
+Commenta: `CLAIM #NUMERO`
 
 ## 3. Lavora sulla soluzione
 - Forka il repository
@@ -28,5 +28,5 @@ Commenta: `/claim @DanielIoni-creator`
 - No copia-incolla da AI senza revisione
 
 ## Contatti
-- Telegram: [inserisci]
-- Discord: [inserisci]
+- Telegram: https://t.me/MyZubster
+- Discord: https://discord.gg/MyZubster
