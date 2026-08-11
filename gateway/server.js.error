@@ -1,0 +1,746 @@
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const cors = require('cors');
+const app = express();
+const port = 3001;
+
+app.use(cors());
+app.use(express.json());
+
+// File di persistenza
+const DATA_FILE = path.join(__dirname, 'payments.json');
+
+// Configurazione wallet
+const MYZ_WALLET = 'myz_77d6ddd05bf30e8fef178ac1b5b5e112';
+const XMR_WALLET = 'xmr_641340aa6aa86029e833a5e5f5fb2b31';
+const PLATFORM_FEE = 2;
+
+// Carica pagamenti
+function loadPayments() {
+    try {
+        if (fs.existsSync(DATA_FILE)) {
+            return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+        }
+    } catch (e) {}
+    return [];
+}
+
+function savePayments(p) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(p, null, 2));
+}
+
+let payments = loadPayments();
+
+// ============================================
+// MEMORIA TEMPORALE DI PYTHO
+// ============================================
+
+const temporalMemory = [];
+const timelineEvents = [
+    { event: '👽 Pytho creato', year: '2024', status: '✅' },
+    { event: '🌿 Primo orto botanico', year: '2024', status: '✅' },
+    { event: '🏛️ Comune di Firenze', year: '2024', status: '✅' },
+    { event: '🚀 Gateway live', year: '2024', status: '✅' },
+    { event: '🛸 Pytho viaggia nel tempo', year: '2124', status: '⏳' },
+    { event: '🌌 Pytho diventa leggenda', year: '3000', status: '🌀' }
+];
+
+// ============================================
+// ROTTE HTML
+// ============================================
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/temporal', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pytho-temporal.html'));
+});
+
+app.get('/temporal.css', (req, res) => {
+    res.sendFile(path.join(__dirname, 'temporal.css'));
+});
+
+app.get('/temporal.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'temporal.js'));
+});
+
+app.get('/mappa-globale', (req, res) => {
+    res.sendFile(path.join(__dirname, 'mappa-globale.html'));
+});
+
+// ============================================
+// ROTTE PYTHO TEMPORAL
+// ============================================
+
+app.post('/api/pytho/timetravel', (req, res) => {
+    const { destination, year } = req.body;
+    const result = {
+        timestamp: new Date().toISOString(),
+        destination: destination || 'Orto Botanico di Roma',
+        year: year || 2024,
+        status: '🛸 Viaggio completato!',
+        pytho: '👽 Il tempo è un concetto umano...',
+        flux: '1.21 GW ⚡'
+    };
+    temporalMemory.push({ event: `Viaggio al ${destination} (${year})`, timestamp: new Date().toISOString() });
+    res.json({ success: true, travel: result });
+});
+
+app.get('/api/pytho/timeline', (req, res) => {
+    res.json({
+        success: true,
+        timeline: timelineEvents,
+        temporal_memory: temporalMemory,
+        status: '🟢 Attivo'
+    });
+});
+
+app.get('/api/pytho/flux', (req, res) => {
+    res.json({
+        success: true,
+        flux: {
+            power: '1.21 GW',
+            charge: Math.floor(Math.random() * 100) + 1 + '%',
+            status: '🔋 Carico'
+        }
+    });
+});
+
+app.post('/api/pytho/voice', (req, res) => {
+    const { command } = req.body;
+    if (!command) {
+        return res.status(400).json({ success: false, error: 'Nessun comando vocale ricevuto' });
+    }
+    const yearMatch = command.match(/\b(\d{4})\b/);
+    const destMatch = command.match(/(?:destinazione|a|al|nel)\s+([a-zA-Z\s]+)/i);
+    let response = { success: true, command: command, pytho_says: '👽 Comando ricevuto!', action: null };
+    if (yearMatch) {
+        const year = yearMatch[1];
+        const destination = destMatch ? destMatch[1].trim() : 'Orto Botanico di Roma';
+        response.pytho_says = `🛸 Viaggio al ${destination} nel ${year} in corso...`;
+        response.action = 'timetravel';
+        response.year = year;
+        response.destination = destination;
+        temporalMemory.push({
+            event: `🗣️ Comando vocale: "${command}" → ${destination} (${year})`,
+            timestamp: new Date().toISOString()
+        });
+        res.json({ ...response, travel: { destination, year: parseInt(year), status: '✅ Viaggio vocale completato!', flux: '1.21 GW ⚡' } });
+    } else {
+        response.pytho_says = "👽 Non ho capito l'anno. Prova: 'Pytho, viaggia al 2124 a Firenze'";
+        res.json(response);
+    }
+});
+
+// ============================================
+// ROTTE PAGAMENTI
+// ============================================
+
+app.post('/api/myz/payment/create', (req, res) => {
+    const { tag_id, amount } = req.body;
+    if (!tag_id || !amount) {
+        return res.status(400).json({ success: false, error: 'tag_id e amount sono obbligatori' });
+    }
+    const fee = (parseFloat(amount) * PLATFORM_FEE) / 100;
+    const netAmount = parseFloat(amount) - fee;
+    const payment = {
+        id: 'myz_' + Date.now() + Math.random().toString(36).substr(2, 5),
+        tag_id,
+        amount: parseFloat(amount),
+        currency: 'MYZ',
+        address: MYZ_WALLET,
+        fee: fee,
+        net_amount: netAmount,
+        status: 'pending',
+        created_at: new Date().toISOString()
+    };
+    payments.push(payment);
+    savePayments(payments);
+    res.json({ success: true, ...payment });
+});
+
+app.get('/api/dashboard', (req, res) => {
+    const total = payments.reduce((s, p) => s + (p.net_amount || p.amount), 0);
+    res.json({
+        success: true,
+        dashboard: {
+            total_payments: payments.length,
+            pending: payments.filter(p => p.status === 'pending').length,
+            paid: payments.filter(p => p.status === 'paid').length,
+            total_myz: total,
+            wallet: { myz: MYZ_WALLET, xmr: XMR_WALLET }
+        }
+    });
+});
+
+app.get('/api/cardputer/payments', (req, res) => {
+    res.json({ success: true, count: payments.length, payments: payments });
+});
+
+app.get('/api/myz/stats', (req, res) => {
+    const myzPayments = payments.filter(p => p.currency === 'MYZ');
+    const totalMYZ = myzPayments.reduce((sum, p) => sum + (p.net_amount || p.amount), 0);
+    const totalFee = myzPayments.reduce((sum, p) => sum + (p.fee || 0), 0);
+    res.json({
+        success: true,
+        stats: {
+            total_payments: myzPayments.length,
+            total_amount: totalMYZ,
+            total_fee: totalFee,
+            pending: myzPayments.filter(p => p.status === 'pending').length,
+            paid: myzPayments.filter(p => p.status === 'paid').length,
+            synced: myzPayments.filter(p => p.synced_to_myz).length
+        }
+    });
+});
+
+// ============================================
+// MAPPA GLOBALE
+// ============================================
+
+const globalMap = {
+    "1500": {
+        "Orto Botanico di Roma": {
+            coordinates: [41.9028, 12.4964],
+            species: ["Rosa Antica", "Lilio", "Orchidea Selvatica", "Menta Romana", "Basilico Antico", "Salvia Romana"],
+            era: "Rinascimento",
+            status: "🌿 Recuperato"
+        }
+    },
+    "1800": {
+        "Orto Botanico di Napoli": {
+            coordinates: [40.8518, 14.2681],
+            species: ["Lilio di Napoli", "Orchidea Napoletana", "Gelsomino Antico", "Violette del Vesuvio"],
+            era: "Ottocento",
+            status: "🌿 Recuperato"
+        }
+    },
+    "1900": {
+        "Orto Botanico di Palermo": {
+            coordinates: [38.1157, 13.3615],
+            species: ["Orchidea Siciliana", "Lilio di Sicilia", "Rosa Palermitana"],
+            era: "Novecento",
+            status: "🌿 Recuperato"
+        }
+    },
+    "2024": {
+        "Orto Botanico di Roma": {
+            coordinates: [41.9028, 12.4964],
+            species: ["Rosa Moderna", "Lilio Ibrido", "Orchidea Tropicale"],
+            era: "Presente",
+            status: "🌱 Attivo"
+        }
+    },
+    "2124": {
+        "Giardino del Futuro": {
+            coordinates: [45.4642, 9.1900],
+            species: ["Rosa Quantica", "Lilio Stellare", "Orchidea Temporale", "Albero di Luce"],
+            era: "Futuro",
+            status: "🛸 Scoperto"
+        }
+    },
+    "3000": {
+        "Orto Botanico Galattico": {
+            coordinates: [0, 0],
+            species: ["Rosa Galattica", "Lilio Interstellare", "Orchidea Quantica", "Fiori di Nebulosa"],
+            era: "Galattico",
+            status: "🌌 Esplorato"
+        }
+    }
+};
+
+app.get('/api/pytho/global-map', (req, res) => {
+    res.json({
+        success: true,
+        map: globalMap,
+        total_locations: Object.keys(globalMap).length,
+        pytho_message: "🌍 La mappa globale del passato è pronta!"
+    });
+});
+
+app.get('/api/pytho/search-plant/:name', (req, res) => {
+    const { name } = req.params;
+    const results = [];
+    for (const [year, locations] of Object.entries(globalMap)) {
+        for (const [location, data] of Object.entries(locations)) {
+            const found = data.species.filter(s => s.toLowerCase().includes(name.toLowerCase()));
+            if (found.length > 0) {
+                results.push({ year, location, species: found, era: data.era, coordinates: data.coordinates });
+            }
+        }
+    }
+    if (results.length > 0) {
+        res.json({
+            success: true,
+            plant: name,
+            found: results,
+            total: results.length,
+            pytho_says: `👽 Ho trovato ${results.length} corrispondenze per "${name}"!`
+        });
+    } else {
+        res.json({
+            success: false,
+            plant: name,
+            found: [],
+            pytho_says: `🌿 Non ho trovato "${name}" nella mappa globale...`
+        });
+    }
+});
+
+// ============================================
+// RIPRODUZIONE SPECIE
+// ============================================
+
+const reproductionStatus = {
+    "Rosa Antica": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
+    "Lilio": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
+    "Orchidea Selvatica": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
+    "Menta Romana": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
+    "Basilico Antico": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
+    "Salvia Romana": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
+    "Lilio di Napoli": { status: "🌱 In riproduzione", progress: 0, era: "1800", location: "Orto Botanico di Napoli" },
+    "Orchidea Napoletana": { status: "🌱 In riproduzione", progress: 0, era: "1800", location: "Orto Botanico di Napoli" },
+    "Gelsomino Antico": { status: "🌱 In riproduzione", progress: 0, era: "1800", location: "Orto Botanico di Napoli" },
+    "Violette del Vesuvio": { status: "🌱 In riproduzione", progress: 0, era: "1800", location: "Orto Botanico di Napoli" },
+    "Orchidea Siciliana": { status: "🌱 In riproduzione", progress: 0, era: "1900", location: "Orto Botanico di Palermo" },
+    "Lilio di Sicilia": { status: "🌱 In riproduzione", progress: 0, era: "1900", location: "Orto Botanico di Palermo" },
+    "Rosa Palermitana": { status: "🌱 In riproduzione", progress: 0, era: "1900", location: "Orto Botanico di Palermo" },
+    "Rosa Quantica": { status: "🛸 In sviluppo", progress: 0, era: "2124", location: "Giardino del Futuro" },
+    "Lilio Stellare": { status: "🛸 In sviluppo", progress: 0, era: "2124", location: "Giardino del Futuro" },
+    "Orchidea Temporale": { status: "🛸 In sviluppo", progress: 0, era: "2124", location: "Giardino del Futuro" },
+    "Albero di Luce": { status: "🛸 In sviluppo", progress: 0, era: "2124", location: "Giardino del Futuro" },
+    "Rosa Galattica": { status: "🌌 In esplorazione", progress: 0, era: "3000", location: "Orto Botanico Galattico" },
+    "Lilio Interstellare": { status: "🌌 In esplorazione", progress: 0, era: "3000", location: "Orto Botanico Galattico" },
+    "Orchidea Quantica": { status: "🌌 In esplorazione", progress: 0, era: "3000", location: "Orto Botanico Galattico" },
+    "Fiori di Nebulosa": { status: "🌌 In esplorazione", progress: 0, era: "3000", location: "Orto Botanico Galattico" }
+};
+
+app.post('/api/pytho/reproduce/:species', (req, res) => {
+    const { species } = req.params;
+    if (reproductionStatus[species]) {
+        reproductionStatus[species].status = "🌱 In riproduzione";
+        reproductionStatus[species].progress = Math.floor(Math.random() * 100) + 1;
+        res.json({ success: true, species, status: reproductionStatus[species], pytho_says: `🌿 La ${species} è in riproduzione!` });
+    } else {
+        res.status(404).json({ success: false, error: `Specie ${species} non trovata`, available_species: Object.keys(reproductionStatus) });
+    }
+});
+
+app.get('/api/pytho/reproduction-status', (req, res) => {
+    const total = Object.keys(reproductionStatus).length;
+    const completed = Object.values(reproductionStatus).filter(s => s.progress >= 100).length;
+    const inProgress = Object.values(reproductionStatus).filter(s => s.progress > 0 && s.progress < 100).length;
+    res.json({
+        success: true,
+        total_species: total,
+        completed: completed,
+        in_progress: inProgress,
+        details: reproductionStatus,
+        pytho_says: `🌿 ${completed}/${total} specie riprodotte!`
+    });
+});
+
+app.post('/api/pytho/complete-reproduction/:species', (req, res) => {
+    const { species } = req.params;
+    if (reproductionStatus[species]) {
+        reproductionStatus[species].status = "✅ Riprodotta!";
+        reproductionStatus[species].progress = 100;
+        temporalMemory.push({
+            event: `🌿 Specie riprodotta: ${species}`,
+            timestamp: new Date().toISOString()
+        });
+        res.json({
+            success: true,
+            species,
+            status: reproductionStatus[species],
+            pytho_says: `🎉 La ${species} è stata riprodotta con successo!`
+        });
+    } else {
+        res.status(404).json({ success: false, error: `Specie ${species} non trovata` });
+    }
+});
+
+// Avvia server
+app.listen(port, () => {
+    console.log('🚀 Pytho Temporal su porta ' + port);
+    console.log('👽 Macchina del tempo attiva!');
+    console.log('🛸 http://localhost:' + port + '/temporal');
+    console.log('📊 http://localhost:' + port + '/api/dashboard');
+});
+
+// ============================================
+// PYTHO CHATBOT - Consigli per l'orto
+// ============================================
+
+const pythoResponses = {
+    'orto': [
+        '🌿 Ciao! Per il tuo orto, ti consiglio di iniziare con piante facili come pomodori e basilico.',
+        '🌱 Ricorda: ogni pianta ha bisogno di luce, acqua e amore! Pytho ti aiuterà.',
+        '🍅 Vuoi sapere quando piantare i pomodori? La primavera è il momento ideale!'
+    ],
+    'piante': [
+        '🌺 Le piante migliori per iniziare: basilico, menta, rosmarino e pomodori ciliegino.',
+        '🌸 Pytho consiglia: piante aromatiche come salvia e timo sono perfette per i principianti.'
+    ],
+    'acqua': [
+        '💧 Innaffia le piante al mattino presto o alla sera, mai quando il sole è alto!',
+        '🌿 L\'acqua è vita! Le piante hanno bisogno di acqua regolare, ma non esagerare.'
+    ],
+    'concime': [
+        '🌱 Usa concime organico come compost o letame maturo per nutrire le tue piante.',
+        '🧪 Pytho dice: il concime liquido è ottimo per le piante in vaso!'
+    ],
+    'malattie': [
+        '🔍 Se vedi macchie sulle foglie, potrebbe essere un fungo. Usa un fungicida naturale.',
+        '🐛 Gli insetti? Prova con olio di neem o sapone di Marsiglia.'
+    ],
+    'compost': [
+        '♻️ Per fare il compost: avanza di frutta, verdura, gusci d\'uovo e foglie secche.',
+        '🔄 Il compost è l\'oro nero del giardiniere! Pytho approva.'
+    ],
+    'clima': [
+        '🌤️ Le piante amano il sole, ma alcune preferiscono l\'ombra. Conosci le tue piante!',
+        '🌡️ Attenzione al gelo! Copri le piante sensibili durante l\'inverno.'
+    ],
+    'potatura': [
+        '✂️ Potare significa tagliare i rami secchi per far crescere la pianta più forte.',
+        '🌳 La potatura si fa in inverno o all\'inizio della primavera.'
+    ],
+    'semina': [
+        '🌱 La semina è il primo passo. Segui le istruzioni sulla confezione dei semi.',
+        '🌻 Pytho consiglia: semina i fiori in primavera per un giardino colorato.'
+    ],
+    'help': [
+        '👽 Ciao! Sono Pytho, l\'alieno giardiniere. Chiedimi consigli su: orto, piante, acqua, concime, malattie, compost, clima, potatura, semina.',
+        '🌿 Pytho è qui per aiutarti con il tuo orto! Cosa vuoi sapere?'
+    ],
+    'default': [
+        '👽 Pytho non ha capito. Prova a chiedermi di orto, piante, acqua, concime, malattie o compost!',
+        '🌿 Non preoccuparti! Sono qui per aiutarti. Chiedimi qualcosa sul tuo orto.'
+    ]
+};
+
+function getPythoResponse(message) {
+    const lower = message.toLowerCase();
+    let response = 'default';
+    
+    if (lower.includes('help') || lower.includes('aiuto')) response = 'help';
+    else if (lower.includes('orto') || lower.includes('giardino')) response = 'orto';
+    else if (lower.includes('pianta') || lower.includes('fiore') || lower.includes('albero')) response = 'piante';
+    else if (lower.includes('acqua') || lower.includes('innaffia')) response = 'acqua';
+    else if (lower.includes('concime') || lower.includes('fertilizzante') || lower.includes('nutriente')) response = 'concime';
+    else if (lower.includes('malattia') || lower.includes('funghi') || lower.includes('parassita') || lower.includes('insetto')) response = 'malattie';
+    else if (lower.includes('compost')) response = 'compost';
+    else if (lower.includes('clima') || lower.includes('sole') || lower.includes('gelo')) response = 'clima';
+    else if (lower.includes('potatura') || lower.includes('taglia')) response = 'potatura';
+    else if (lower.includes('semina') || lower.includes('semi') || lower.includes('piantare')) response = 'semina';
+    
+    const responses = pythoResponses[response] || pythoResponses['default'];
+    return responses[Math.floor(Math.random() * responses.length)];
+}
+
+// ROTTA: Chat con Pytho
+app.post('/api/pytho/chat', (req, res) => {
+    const { message, history } = req.body;
+    
+    if (!message) {
+        return res.status(400).json({
+            success: false,
+            error: 'Pytho ha bisogno di un messaggio per risponderti!'
+        });
+    }
+    
+    const response = getPythoResponse(message);
+    
+    // Registra la conversazione nella memoria temporale
+    temporalMemory.push({
+        event: `🗣️ Chat con Pytho: "${message}" → "${response}"`,
+        timestamp: new Date().toISOString()
+    });
+    
+    res.json({
+        success: true,
+        message: message,
+        response: response,
+        pytho_says: response,
+        timestamp: new Date().toISOString(),
+        history: history || []
+    });
+});
+
+// ROTTA: Ottieni consiglio casuale
+app.get('/api/pytho/advice', (req, res) => {
+    const topics = Object.keys(pythoResponses).filter(k => k !== 'default' && k !== 'help');
+    const topic = topics[Math.floor(Math.random() * topics.length)];
+    const responses = pythoResponses[topic] || pythoResponses['default'];
+    const advice = responses[Math.floor(Math.random() * responses.length)];
+    
+    res.json({
+        success: true,
+        topic: topic,
+        advice: advice,
+        pytho_says: advice,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// ROTTA: Pagina chat
+app.get('/chat', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pytho-chat.html'));
+});
+
+// ============================================
+// PYTHO CHATBOT - Versione avanzata
+// ============================================
+
+// Aggiorna la funzione di riconoscimento con più parole chiave
+function getPythoResponse(message) {
+    const lower = message.toLowerCase();
+    let response = 'default';
+    
+    // Parole chiave per ogni categoria
+    const keywords = {
+        'help': ['help', 'aiuto', 'consiglio', 'suggerimento', 'cosa fare', 'come fare'],
+        'orto': ['orto', 'giardino', 'coltivare', 'semina', 'piantare', 'pomodori', 'pomodoro', 'insalata', 'lattuga', 'zucchine', 'peperoni', 'melanzane', 'fagioli', 'piselli', 'carote', 'ravanelli', 'cipolle', 'aglio', 'prezzemolo', 'basilico'],
+        'piante': ['pianta', 'piante', 'fiore', 'albero', 'arbusto', 'perenne', 'annuale', 'bulbo', 'rizoma', 'talea'],
+        'acqua': ['acqua', 'innaffiare', 'irrigare', 'bagnare', 'umidità', 'umido', 'secco', 'goccia', 'pioggia'],
+        'concime': ['concime', 'fertilizzante', 'nutriente', 'compost', 'letame', 'humus', 'azoto', 'fosforo', 'potassio', 'organico', 'minerale'],
+        'malattie': ['malattia', 'funghi', 'parassita', 'insetto', 'afide', 'ragnetto', 'mosca', 'bruco', 'lumaca', 'chiocciola', 'macchia', 'foglia'],
+        'compost': ['compost', 'riciclo', 'scarti', 'organico', 'decomporre', 'terreno', 'humus'],
+        'clima': ['clima', 'sole', 'ombra', 'gelo', 'freddo', 'caldo', 'temperatura', 'venti', 'umidità', 'microclima'],
+        'potatura': ['potatura', 'tagliare', 'ramo', 'rami', 'cespuglio', 'siepe', 'albero', 'frutto'],
+        'semina': ['semina', 'semi', 'piantare', 'germogliare', 'germinazione', 'trapianto', 'vaso', 'terreno']
+    };
+    
+    // Verifica ogni categoria
+    for (const [category, words] of Object.entries(keywords)) {
+        if (words.some(word => lower.includes(word))) {
+            response = category;
+            break;
+        }
+    }
+    
+    // Se non ha trovato corrispondenza, controlla per parole singole
+    if (response === 'default') {
+        // Cerca parole comuni nell'orto
+        const commonWords = ['pomodori', 'insalata', 'zucchine', 'fiori', 'piante', 'acqua', 'sole', 'terra', 'vaso', 'semi', 'germogli'];
+        if (commonWords.some(word => lower.includes(word))) {
+            response = 'orto';
+        }
+    }
+    
+    const responses = pythoResponses[response] || pythoResponses['default'];
+    return responses[Math.floor(Math.random() * responses.length)];
+}
+
+// ============================================
+// PYTHO KNOWLEDGE - Integrazione
+// ============================================
+
+const { getPythoKnowledge } = require('./pytho-knowledge.js');
+
+// ROTTA: Chat con Pytho - Versione knowledge
+app.post('/api/pytho/chat', (req, res) => {
+    const { message } = req.body;
+    
+    if (!message) {
+        return res.status(400).json({
+            success: false,
+            error: 'Pytho ha bisogno di un messaggio per risponderti!'
+        });
+    }
+    
+    // Usa la knowledge base
+    const response = getPythoKnowledge(message);
+    
+    // Registra la conversazione
+    temporalMemory.push({
+        event: `🗣️ Chat Knowledge: "${message}" → "${response}"`,
+        timestamp: new Date().toISOString()
+    });
+    
+    res.json({
+        success: true,
+        message: message,
+        response: response,
+        pytho_says: response,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// ============================================
+// PYTHO CHAT - Riconoscimento avanzato
+// ============================================
+
+// Parole chiave per ogni categoria
+const chatKeywords = {
+    'help': ['help', 'aiuto', 'consiglio', 'suggerimento', 'cosa fare', 'come fare', 'aiutami'],
+    'orto': ['orto', 'giardino', 'coltivare', 'semina', 'piantare', 'pomodori', 'pomodoro', 'insalata', 'lattuga', 'zucchine', 'peperoni', 'melanzane', 'fagioli', 'piselli', 'carote', 'ravanelli', 'cipolle', 'aglio', 'prezzemolo', 'basilico', 'piante', 'verdura', 'ortaggio'],
+    'piante': ['pianta', 'piante', 'fiore', 'albero', 'arbusto', 'perenne', 'annuale', 'bulbo', 'rizoma', 'talea', 'erba', 'cespuglio', 'ramo'],
+    'acqua': ['acqua', 'innaffiare', 'irrigare', 'bagnare', 'umidità', 'umido', 'secco', 'goccia', 'pioggia'],
+    'concime': ['concime', 'fertilizzante', 'nutriente', 'compost', 'letame', 'humus', 'azoto', 'fosforo', 'potassio', 'organico', 'minerale'],
+    'malattie': ['malattia', 'funghi', 'parassita', 'insetto', 'afide', 'ragnetto', 'mosca', 'bruco', 'lumaca', 'chiocciola', 'macchia', 'foglia', 'marciume'],
+    'compost': ['compost', 'riciclo', 'scarti', 'organico', 'decomporre', 'terreno', 'humus'],
+    'clima': ['clima', 'sole', 'ombra', 'gelo', 'freddo', 'caldo', 'temperatura', 'venti', 'umidità', 'microclima', 'pioggia'],
+    'potatura': ['potatura', 'tagliare', 'ramo', 'rami', 'cespuglio', 'siepe', 'albero', 'frutto'],
+    'semina': ['semina', 'semi', 'piantare', 'germogliare', 'germinazione', 'trapianto', 'vaso', 'terreno'],
+    'daniel': ['daniel', 'creatore', 'fondatore', 'ideatore', 'daniele', 'padre', 'inventore'],
+    'issue': ['issue', 'problemi', 'bug', 'richiesta', 'feature', 'miglioramento', 'github'],
+    'storia': ['storia', 'passato', 'origine', 'inizio', 'primi passi', 'nascita', 'inizio'],
+    'futuro': ['futuro', 'prossimo', 'piano', 'visione', 'obiettivo', 'progetti', 'destino'],
+    'piante_issue': ['pianta', 'specie', 'orto', 'botanico', 'recuperata', 'coltivazione', 'specie', 'varietà']
+};
+
+// Aggiorna la funzione getPythoResponse per usare tutte le parole chiave
+function getPythoResponse(message) {
+    const lower = message.toLowerCase();
+    let response = 'default';
+    
+    // Controlla tutte le categorie
+    for (const [category, words] of Object.entries(chatKeywords)) {
+        if (words.some(word => lower.includes(word))) {
+            response = category;
+            break;
+        }
+    }
+    
+    const responses = pythoResponses[response] || pythoResponses['default'];
+    return responses[Math.floor(Math.random() * responses.length)];
+}
+
+// Aggiungi risposte per le nuove categorie
+const pythoResponses = {
+    'orto': [
+        '🌿 Ciao! Per il tuo orto, ti consiglio di iniziare con piante facili come pomodori e basilico.',
+        '🌱 Ricorda: ogni pianta ha bisogno di luce, acqua e amore! Pytho ti aiuterà.',
+        '🍅 Vuoi sapere quando piantare i pomodori? La primavera è il momento ideale!',
+        '🥬 Per un orto rigoglioso, ruota le colture ogni anno per non impoverire il terreno.',
+        '🌿 Pytho consiglia: inizia con un piccolo orto e cresci gradualmente!'
+    ],
+    'piante': [
+        '🌺 Le piante migliori per iniziare: basilico, menta, rosmarino e pomodori ciliegino.',
+        '🌸 Pytho consiglia: piante aromatiche come salvia e timo sono perfette per i principianti.',
+        '🌿 Ogni pianta ha bisogno di spazio per crescere. Non sovrapporle!'
+    ],
+    'acqua': [
+        '💧 Innaffia le piante al mattino presto o alla sera, mai quando il sole è alto!',
+        '🌿 L\'acqua è vita! Le piante hanno bisogno di acqua regolare, ma non esagerare.',
+        '🌱 Pytho dice: meglio un po\' meno acqua che troppa!'
+    ],
+    'concime': [
+        '🌱 Usa concime organico come compost o letame maturo per nutrire le tue piante.',
+        '🧪 Pytho dice: il concime liquido è ottimo per le piante in vaso!',
+        '🌿 Un terreno ben nutrito produce piante sane e forti.'
+    ],
+    'malattie': [
+        '🔍 Se vedi macchie sulle foglie, potrebbe essere un fungo. Usa un fungicida naturale.',
+        '🐛 Gli insetti? Prova con olio di neem o sapone di Marsiglia.',
+        '🌿 Prevenire è meglio che curare: mantieni le piante pulite e ben arieggiate.'
+    ],
+    'compost': [
+        '♻️ Per fare il compost: avanza di frutta, verdura, gusci d\'uovo e foglie secche.',
+        '🔄 Il compost è l\'oro nero del giardiniere! Pytho approva.',
+        '🌱 Mescola il compost ogni settimana per accelerare il processo.'
+    ],
+    'clima': [
+        '🌤️ Le piante amano il sole, ma alcune preferiscono l\'ombra. Conosci le tue piante!',
+        '🌡️ Attenzione al gelo! Copri le piante sensibili durante l\'inverno.',
+        '🌿 Ogni pianta ha il suo clima ideale. Informati prima di piantare.'
+    ],
+    'potatura': [
+        '✂️ Potare significa tagliare i rami secchi per far crescere la pianta più forte.',
+        '🌳 La potatura si fa in inverno o all\'inizio della primavera.',
+        '🌿 Rimuovi sempre i rami malati per evitare che la malattia si diffonda.'
+    ],
+    'semina': [
+        '🌱 La semina è il primo passo. Segui le istruzioni sulla confezione dei semi.',
+        '🌻 Pytho consiglia: semina i fiori in primavera per un giardino colorato.',
+        '🌿 Semina in luna crescente per una migliore germinazione!'
+    ],
+    'daniel': [
+        '👨‍🌾 Daniel ha creato Pytho per aiutare le persone a coltivare orti sostenibili!',
+        '📚 Daniel ha documentato tutto il processo in oltre 100 issue su GitHub.',
+        '🌟 Pytho è nato da un\'idea di Daniel per unire blockchain e orti botanici.',
+        '💚 Daniel crede che la tecnologia possa rendere il mondo più verde!'
+    ],
+    'issue': [
+        '📋 Pytho si basa sulle issue di GitHub create da Daniel per imparare e crescere.',
+        '🔍 Ogni issue è una lezione! Pytho ha imparato da oltre 100 problemi risolti.',
+        '📝 Le issue raccontano la storia di MyZubster, dai primi passi al futuro.',
+        '🌟 Ogni issue è un passo avanti per il progetto!'
+    ],
+    'storia': [
+        '📜 La storia di MyZubster inizia con Daniel che voleva creare un orto botanico su blockchain.',
+        '🌿 Pytho è il guardiano della storia botanica, registrando piante dal 1500 al 3000.',
+        '🛸 Il viaggio di Pytho nel tempo è iniziato con la issue #1: "Creare un orto botanico decentralizzato".',
+        '📚 Ogni pianta recuperata ha una storia unica documentata su GitHub.'
+    ],
+    'futuro': [
+        '🚀 Il futuro di Pytho è guidato dalle issue della community! Ogni contributo conta.',
+        '🌌 Pytho diventerà una guida universale per orti botanici, basata sulla conoscenza collettiva.',
+        '💚 Daniel e Pytho stanno costruendo un futuro dove ogni orto è tracciato su blockchain.',
+        '🌟 Il futuro è verde e decentralizzato! Pytho ti guiderà.'
+    ],
+    'piante_issue': [
+        '🌱 Le piante recuperate da Pytho sono state documentate nelle issue: Rosa Antica (#42), Lilio (#43), Orchidea Selvatica (#44).',
+        '📊 Ogni specie recuperata ha una issue dedicata con dettagli sulla sua storia e coltivazione.',
+        '🌿 Le 24 specie di Pytho sono state tutte documentate attraverso le issue di GitHub.',
+        '📝 Pytho ha creato una mappa globale delle piante recuperate nel tempo.'
+    ],
+    'help': [
+        '👽 Ciao! Sono Pytho, l\'alieno giardiniere. Chiedimi consigli su: orto, piante, acqua, concime, malattie, compost, clima, potatura, semina, o sulla storia di Daniel e le issue su GitHub.',
+        '🌿 Pytho è qui per aiutarti con il tuo orto! Cosa vuoi sapere?',
+        '💚 Chiedimi qualsiasi cosa su orti, piante, o la storia di MyZubster!'
+    ],
+    'default': [
+        '👽 Pytho non ha capito. Prova a chiedermi di orto, piante, acqua, concime, malattie, compost, clima, potatura, semina, o sulla storia di Daniel e le issue su GitHub!',
+        '🌿 Non preoccuparti! Sono qui per aiutarti. Chiedimi qualcosa sul tuo orto o sul progetto MyZubster.',
+        '💡 Pytho conosce la storia di MyZubster! Chiedimi di Daniel, le issue, o il futuro del progetto.'
+    ]
+};
+
+// ============================================
+// PYTHO AI - Integrazione con modello locale
+// ============================================
+
+const { getPythoAIResponse } = require('./pytho-ai.js');
+
+// ROTTA: Chat con Pytho - Versione AI
+app.post('/api/pytho/chat', async (req, res) => {
+    const { message, history = [] } = req.body;
+    
+    if (!message) {
+        return res.status(400).json({
+            success: false,
+            error: 'Pytho ha bisogno di un messaggio per risponderti!'
+        });
+    }
+    
+    try {
+        // Ottieni risposta dall'AI
+        const response = await getPythoAIResponse(message, history);
+        
+        // Registra la conversazione
+        temporalMemory.push({
+            event: `🧠 Chat AI: "${message}" → "${response.substring(0, 100)}..."`,
+            timestamp: new Date().toISOString()
+        });
+        
+        res.json({
+            success: true,
+            message: message,
+            response: response,
+            pytho_says: response,
+            timestamp: new Date().toISOString(),
+            history: [...history, { role: 'user', content: message }, { role: 'assistant', content: response }]
+        });
+    } catch (error) {
+        console.error('Errore chat:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Pytho ha avuto un problema, riprova più tardi.'
+        });
+    }
+});
