@@ -32,10 +32,7 @@ function savePayments(p) {
 
 let payments = loadPayments();
 
-// ============================================
-// MEMORIA TEMPORALE DI PYTHO
-// ============================================
-
+// Memoria temporale di Pytho
 const temporalMemory = [];
 const timelineEvents = [
     { event: '👽 Pytho creato', year: '2024', status: '✅' },
@@ -45,6 +42,92 @@ const timelineEvents = [
     { event: '🛸 Pytho viaggia nel tempo', year: '2124', status: '⏳' },
     { event: '🌌 Pytho diventa leggenda', year: '3000', status: '🌀' }
 ];
+
+// ============================================
+// RISPOSTE DI PYTHO
+// ============================================
+
+const pythoResponses = {
+    'myz': [
+        '🪙 MYZ è il token nativo dell\'ecosistema MyZubster, basato su blockchain.',
+        '🌿 MYZ serve per incentivare la cura degli orti botanici e la sostenibilità.',
+        '💰 Con MYZ puoi pagare servizi, acquistare piante e partecipare alla governance.',
+        '🌱 Ogni pianta registrata su MyZubster genera ricompense in MYZ.'
+    ],
+    'monero': [
+        '🔶 Monero (XMR) è una criptovaluta focalizzata sulla privacy e l\'anonimato.',
+        '🔒 Le transazioni in Monero sono private e non tracciabili.',
+        '💰 Monero utilizza firme ad anello e indirizzi stealth per proteggere la privacy.',
+        '🌿 MyZubster accetta pagamenti in Monero per transazioni sicure e private.'
+    ],
+    'fluffypony': [
+        '🐴 Fluffypony è il soprannome di Riccardo Spagni, uno dei fondatori di Monero.',
+        '🇮🇹 Riccardo Spagni è italiano e ha portato Monero alla ribalta internazionale.',
+        '🛡️ Grazie a Fluffypony, Monero ha mantenuto la sua rotta verso la privacy assoluta.',
+        '💚 Pytho ammira Fluffypony per la sua dedizione alla privacy e alla libertà.'
+    ],
+    'chiesa': [
+        '⛪ La chiesa è un punto di riferimento spirituale e comunitario.',
+        '🌿 In molte comunità, la chiesa gestisce orti e giardini per sostenere i bisognosi.',
+        '🌸 Gli orti della chiesa sono spesso luoghi di pace e riflessione.',
+        '🌻 La chiesa può essere un partner importante per progetti di giardinaggio comunitario.'
+    ],
+    'musica': [
+        '🎵 La musica è l\'anima del mondo vegetale! Le piante reagiscono positivamente alle vibrazioni sonore.',
+        '🌿 Gli studi dimostrano che la musica classica favorisce la crescita delle piante.',
+        '🎶 Pytho ama la musica! È il sottofondo perfetto per viaggiare nel tempo.',
+        '🌻 La musica e la natura sono due facce della stessa medaglia.'
+    ],
+    'default': [
+        '👽 Non ho capito. Prova a chiedermi di: MYZ, Monero, Fluffypony, chiesa, musica, orto, piante, acqua, concime, malattie, compost, clima, potatura o semina!',
+        '🌿 Chiedimi qualcosa su MyZubster o sul tuo orto!'
+    ],
+    'help': [
+        '👽 Ciao! Sono Pytho. Chiedimi di: MYZ, Monero, Fluffypony, chiesa, musica, orto, piante, acqua, concime, malattie, compost, clima, potatura o semina!',
+        '🌿 Pytho è un esperto di orti e di MyZubster.'
+    ]
+};
+
+// Funzione per ottenere risposte
+function getPythoResponse(message) {
+    const lower = message.toLowerCase();
+    let response = 'default';
+    
+    if (lower.includes('myz') || lower.includes('token')) {
+        response = 'myz';
+    } else if (lower.includes('monero') || lower.includes('xmr')) {
+        response = 'monero';
+    } else if (lower.includes('fluffypony') || lower.includes('riccardo')) {
+        response = 'fluffypony';
+    } else if (lower.includes('chiesa') || lower.includes('parrocchia')) {
+        response = 'chiesa';
+    } else if (lower.includes('musica') || lower.includes('canzone')) {
+        response = 'musica';
+    } else if (lower.includes('help') || lower.includes('aiuto')) {
+        response = 'help';
+    } else if (lower.includes('orto') || lower.includes('giardino')) {
+        response = 'orto';
+    } else if (lower.includes('pianta') || lower.includes('fiore')) {
+        response = 'piante';
+    } else if (lower.includes('acqua') || lower.includes('innaffiare')) {
+        response = 'acqua';
+    } else if (lower.includes('concime') || lower.includes('fertilizzante')) {
+        response = 'concime';
+    } else if (lower.includes('malattia') || lower.includes('funghi')) {
+        response = 'malattie';
+    } else if (lower.includes('compost')) {
+        response = 'compost';
+    } else if (lower.includes('clima') || lower.includes('sole')) {
+        response = 'clima';
+    } else if (lower.includes('potatura') || lower.includes('taglia')) {
+        response = 'potatura';
+    } else if (lower.includes('semina') || lower.includes('semi')) {
+        response = 'semina';
+    }
+    
+    const responses = pythoResponses[response] || pythoResponses['default'];
+    return responses[Math.floor(Math.random() * responses.length)];
+}
 
 // ============================================
 // ROTTE HTML
@@ -58,19 +141,18 @@ app.get('/temporal', (req, res) => {
     res.sendFile(path.join(__dirname, 'pytho-temporal.html'));
 });
 
-app.get('/temporal.css', (req, res) => {
-    res.sendFile(path.join(__dirname, 'temporal.css'));
+app.get('/chat', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pytho-chat.html'));
 });
 
-app.get('/temporal.js', (req, res) => {
-    res.sendFile(path.join(__dirname, 'temporal.js'));
+app.get('/mappa-globale', (req, res) => {
+    res.sendFile(path.join(__dirname, 'mappa-globale.html'));
 });
 
 // ============================================
 // ROTTE PYTHO TEMPORAL
 // ============================================
 
-// ROTTA: Viaggia nel tempo
 app.post('/api/pytho/timetravel', (req, res) => {
     const { destination, year } = req.body;
     const result = {
@@ -85,7 +167,6 @@ app.post('/api/pytho/timetravel', (req, res) => {
     res.json({ success: true, travel: result });
 });
 
-// ROTTA: Timeline di Pytho
 app.get('/api/pytho/timeline', (req, res) => {
     res.json({
         success: true,
@@ -95,7 +176,6 @@ app.get('/api/pytho/timeline', (req, res) => {
     });
 });
 
-// ROTTA: Flux Capacitor
 app.get('/api/pytho/flux', (req, res) => {
     res.json({
         success: true,
@@ -107,76 +187,89 @@ app.get('/api/pytho/flux', (req, res) => {
     });
 });
 
-// ROTTA: Riconoscimento vocale - VERSIONE CORRETTA
-app.post('/api/pytho/voice', (req, res) => {
-    const { command } = req.body;
+// ============================================
+// CHAT DI PYTHO (CON NOTIZIE)
+// ============================================
+
+// Notizie di esempio
+const sampleNews = [
+    '📰 **Monero raggiunge nuovo massimo storico!** - La privacy coin cresce del 15% in una settimana.',
+    '📰 **Giardino Botanico di Roma inizia progetto di sostenibilità** - Nuovo orto urbano con pagamenti in XMR.',
+    '📰 **Fluffypony: "La privacy è un diritto fondamentale"** - Intervista esclusiva al fondatore di Monero.',
+    '📰 **MyZubster annuncia partnership con comuni italiani** - Progetto di orti botanici decentralizzati.',
+    '📰 **Musica e natura: studio rivela che le piante amano Mozart** - Crescita del 20% con la musica classica.'
+];
+
+app.post('/api/pytho/chat', (req, res) => {
+    const { message } = req.body;
     
-    if (!command) {
+    if (!message) {
         return res.status(400).json({
             success: false,
-            error: 'Nessun comando vocale ricevuto'
+            error: 'Pytho ha bisogno di un messaggio per risponderti!'
         });
     }
     
-    // Estrai anno (4 cifre)
-    const yearMatch = command.match(/\b(\d{4})\b/);
-    // Estrai destinazione (parole dopo "destinazione", "a", "al", "nel")
-    const destMatch = command.match(/(?:destinazione|a|al|nel)\s+([a-zA-Z\s]+)/i);
+    const lower = message.toLowerCase();
+    let response = '';
     
-    let response = {
+    // Verifica se la domanda è sulle notizie
+    if (lower.includes('notizie') || lower.includes('news') || lower.includes('ultime') || lower.includes('novità') || lower.includes('aggiornamenti')) {
+        // Notizie per Daniel
+        if (lower.includes('daniel') || lower.includes('io') || lower.includes('mio')) {
+            response = '📰 **Ecco le notizie che potrebbero interessarti, Daniel:**\n\n' + sampleNews.map((n, i) => `${i+1}. ${n}`).join('\n\n');
+        } else {
+            response = '📰 **Ultime notizie dal mondo:**\n\n' + sampleNews.map((n, i) => `${i+1}. ${n}`).join('\n\n');
+        }
+    } 
+    // Notizie su Monero
+    else if (lower.includes('monero') || lower.includes('xmr')) {
+        const moneroNews = sampleNews.filter(n => n.toLowerCase().includes('monero') || n.toLowerCase().includes('xmr'));
+        if (moneroNews.length > 0) {
+            response = '🔶 **Notizie su Monero:**\n\n' + moneroNews.map((n, i) => `${i+1}. ${n}`).join('\n\n');
+        } else {
+            response = getPythoResponse(message);
+        }
+    }
+    // Notizie sugli orti
+    else if (lower.includes('giardino') || lower.includes('orto') || lower.includes('botanico')) {
+        const gardenNews = sampleNews.filter(n => n.toLowerCase().includes('giardino') || n.toLowerCase().includes('orto') || n.toLowerCase().includes('botanico'));
+        if (gardenNews.length > 0) {
+            response = '🌿 **Notizie sui giardini botanici:**\n\n' + gardenNews.map((n, i) => `${i+1}. ${n}`).join('\n\n');
+        } else {
+            response = getPythoResponse(message);
+        }
+    }
+    // Altrimenti risposta standard
+    else {
+        response = getPythoResponse(message);
+    }
+    
+    temporalMemory.push({
+        event: `🗣️ Chat: "${message}" → "${response.substring(0, 100)}..."`,
+        timestamp: new Date().toISOString()
+    });
+    
+    res.json({
         success: true,
-        command: command,
-        pytho_says: '👽 Comando ricevuto!',
-        action: null
-    };
-    
-    if (yearMatch) {
-        const year = yearMatch[1];
-        const destination = destMatch ? destMatch[1].trim() : 'Orto Botanico di Roma';
-        
-        response.pytho_says = `🛸 Viaggio al ${destination} nel ${year} in corso...`;
-        response.action = 'timetravel';
-        response.year = year;
-        response.destination = destination;
-        
-        temporalMemory.push({
-            event: `🗣️ Comando vocale: "${command}" → ${destination} (${year})`,
-            timestamp: new Date().toISOString()
-        });
-        
-        res.json({
-            ...response,
-            travel: {
-                destination: destination,
-                year: parseInt(year),
-                status: '✅ Viaggio vocale completato!',
-                flux: '1.21 GW ⚡'
-            }
-        });
-    } else {
-        response.pytho_says = "👽 Non ho capito l'anno. Prova: 'Pytho, viaggia al 2124 a Firenze'";
-        res.json(response);
-    }
+        message: message,
+        response: response,
+        pytho_says: response,
+        timestamp: new Date().toISOString()
+    });
 });
 
 // ============================================
 // ROTTE PAGAMENTI
 // ============================================
 
-// ROTTA: Crea pagamento MYZ
 app.post('/api/myz/payment/create', (req, res) => {
     const { tag_id, amount } = req.body;
-    
     if (!tag_id || !amount) {
-        return res.status(400).json({
-            success: false,
-            error: 'tag_id e amount sono obbligatori'
-        });
+        return res.status(400).json({ success: false, error: 'tag_id e amount sono obbligatori' });
     }
-    
     const fee = (parseFloat(amount) * PLATFORM_FEE) / 100;
     const netAmount = parseFloat(amount) - fee;
-    
     const payment = {
         id: 'myz_' + Date.now() + Math.random().toString(36).substr(2, 5),
         tag_id,
@@ -188,13 +281,11 @@ app.post('/api/myz/payment/create', (req, res) => {
         status: 'pending',
         created_at: new Date().toISOString()
     };
-    
     payments.push(payment);
     savePayments(payments);
     res.json({ success: true, ...payment });
 });
 
-// ROTTA: Dashboard
 app.get('/api/dashboard', (req, res) => {
     const total = payments.reduce((s, p) => s + (p.net_amount || p.amount), 0);
     res.json({
@@ -209,21 +300,14 @@ app.get('/api/dashboard', (req, res) => {
     });
 });
 
-// ROTTA: Lista pagamenti
 app.get('/api/cardputer/payments', (req, res) => {
-    res.json({
-        success: true,
-        count: payments.length,
-        payments: payments
-    });
+    res.json({ success: true, count: payments.length, payments: payments });
 });
 
-// ROTTA: Statistiche MYZ
 app.get('/api/myz/stats', (req, res) => {
     const myzPayments = payments.filter(p => p.currency === 'MYZ');
     const totalMYZ = myzPayments.reduce((sum, p) => sum + (p.net_amount || p.amount), 0);
     const totalFee = myzPayments.reduce((sum, p) => sum + (p.fee || 0), 0);
-    
     res.json({
         success: true,
         stats: {
@@ -238,70 +322,7 @@ app.get('/api/myz/stats', (req, res) => {
 });
 
 // ============================================
-// AVVIA SERVER
-// ============================================
-
-app.listen(port, () => {
-    console.log('🚀 Pytho Temporal su porta ' + port);
-    console.log('👽 Macchina del tempo attiva!');
-    console.log('🛸 http://localhost:' + port + '/temporal');
-    console.log('📊 http://localhost:' + port + '/api/dashboard');
-});
-
-// ============================================
-// PYTHO BOTANICAL PAST REGISTRY
-// ============================================
-
-const botanicalRegistry = [];
-
-// ROTTA: Registra specie del passato
-app.post('/api/pytho/botanical-past', (req, res) => {
-    const { location, year, species, register } = req.body;
-    
-    if (!location || !year || !species) {
-        return res.status(400).json({
-            success: false,
-            error: 'Location, year e species sono obbligatori'
-        });
-    }
-    
-    const record = {
-        id: 'bot_' + Date.now() + Math.random().toString(36).substr(2, 5),
-        location: location,
-        year: year,
-        species: species,
-        register: register || false,
-        registered_at: new Date().toISOString(),
-        pytho_approved: true
-    };
-    
-    botanicalRegistry.push(record);
-    
-    temporalMemory.push({
-        event: `🌿 Registrate ${species.length} specie a ${location} (${year})`,
-        timestamp: new Date().toISOString()
-    });
-    
-    res.json({
-        success: true,
-        record: record,
-        pytho_message: '👽 La storia botanica è al sicuro!',
-        total_registered: botanicalRegistry.length
-    });
-});
-
-// ROTTA: Lista specie registrate
-app.get('/api/pytho/botanical-history', (req, res) => {
-    res.json({
-        success: true,
-        records: botanicalRegistry,
-        total: botanicalRegistry.length,
-        pytho_status: '🟢 Guardiano della storia botanica'
-    });
-});
-
-// ============================================
-// MAPPA GLOBALE DEL PASSATO
+// MAPPA GLOBALE
 // ============================================
 
 const globalMap = {
@@ -355,59 +376,26 @@ const globalMap = {
     }
 };
 
-// ROTTA: Mappa globale del passato
 app.get('/api/pytho/global-map', (req, res) => {
     res.json({
         success: true,
         map: globalMap,
         total_locations: Object.keys(globalMap).length,
-        pytho_message: "🌍 La mappa globale del passato è pronta!",
-        pytho_status: "🟢 Guardiano della storia botanica"
+        pytho_message: "🌍 La mappa globale del passato è pronta!"
     });
 });
 
-// ROTTA: Mappa per epoca
-app.get('/api/pytho/map/:year', (req, res) => {
-    const { year } = req.params;
-    
-    if (globalMap[year]) {
-        res.json({
-            success: true,
-            year: year,
-            locations: globalMap[year],
-            pytho_says: `🛸 Ecco le piante del ${year}!`
-        });
-    } else {
-        res.status(404).json({
-            success: false,
-            error: `Nessuna pianta registrata per il ${year}`,
-            available_years: Object.keys(globalMap)
-        });
-    }
-});
-
-// ROTTA: Cerca pianta per nome
 app.get('/api/pytho/search-plant/:name', (req, res) => {
     const { name } = req.params;
     const results = [];
-    
     for (const [year, locations] of Object.entries(globalMap)) {
         for (const [location, data] of Object.entries(locations)) {
-            const found = data.species.filter(s => 
-                s.toLowerCase().includes(name.toLowerCase())
-            );
+            const found = data.species.filter(s => s.toLowerCase().includes(name.toLowerCase()));
             if (found.length > 0) {
-                results.push({
-                    year: year,
-                    location: location,
-                    species: found,
-                    era: data.era,
-                    coordinates: data.coordinates
-                });
+                results.push({ year, location, species: found, era: data.era, coordinates: data.coordinates });
             }
         }
     }
-    
     if (results.length > 0) {
         res.json({
             success: true,
@@ -426,13 +414,8 @@ app.get('/api/pytho/search-plant/:name', (req, res) => {
     }
 });
 
-// ROTTA: Mappa Globale HTML
-app.get('/mappa-globale', (req, res) => {
-    res.sendFile(path.join(__dirname, 'mappa-globale.html'));
-});
-
 // ============================================
-// SISTEMA DI RIPRODUZIONE SPECIE ANTICHE
+// RIPRODUZIONE SPECIE
 // ============================================
 
 const reproductionStatus = {
@@ -441,53 +424,24 @@ const reproductionStatus = {
     "Orchidea Selvatica": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
     "Menta Romana": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
     "Basilico Antico": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
-    "Salvia Romana": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
-    "Lilio di Napoli": { status: "🌱 In riproduzione", progress: 0, era: "1800", location: "Orto Botanico di Napoli" },
-    "Orchidea Napoletana": { status: "🌱 In riproduzione", progress: 0, era: "1800", location: "Orto Botanico di Napoli" },
-    "Gelsomino Antico": { status: "🌱 In riproduzione", progress: 0, era: "1800", location: "Orto Botanico di Napoli" },
-    "Violette del Vesuvio": { status: "🌱 In riproduzione", progress: 0, era: "1800", location: "Orto Botanico di Napoli" },
-    "Orchidea Siciliana": { status: "🌱 In riproduzione", progress: 0, era: "1900", location: "Orto Botanico di Palermo" },
-    "Lilio di Sicilia": { status: "🌱 In riproduzione", progress: 0, era: "1900", location: "Orto Botanico di Palermo" },
-    "Rosa Palermitana": { status: "🌱 In riproduzione", progress: 0, era: "1900", location: "Orto Botanico di Palermo" },
-    "Rosa Quantica": { status: "🛸 In sviluppo", progress: 0, era: "2124", location: "Giardino del Futuro" },
-    "Lilio Stellare": { status: "🛸 In sviluppo", progress: 0, era: "2124", location: "Giardino del Futuro" },
-    "Orchidea Temporale": { status: "🛸 In sviluppo", progress: 0, era: "2124", location: "Giardino del Futuro" },
-    "Albero di Luce": { status: "🛸 In sviluppo", progress: 0, era: "2124", location: "Giardino del Futuro" },
-    "Rosa Galattica": { status: "🌌 In esplorazione", progress: 0, era: "3000", location: "Orto Botanico Galattico" },
-    "Lilio Interstellare": { status: "🌌 In esplorazione", progress: 0, era: "3000", location: "Orto Botanico Galattico" },
-    "Orchidea Quantica": { status: "🌌 In esplorazione", progress: 0, era: "3000", location: "Orto Botanico Galattico" },
-    "Fiori di Nebulosa": { status: "🌌 In esplorazione", progress: 0, era: "3000", location: "Orto Botanico Galattico" }
+    "Salvia Romana": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" }
 };
 
-// ROTTA: Avvia riproduzione specie
 app.post('/api/pytho/reproduce/:species', (req, res) => {
     const { species } = req.params;
-    
     if (reproductionStatus[species]) {
         reproductionStatus[species].status = "🌱 In riproduzione";
         reproductionStatus[species].progress = Math.floor(Math.random() * 100) + 1;
-        
-        res.json({
-            success: true,
-            species: species,
-            status: reproductionStatus[species],
-            pytho_says: `🌿 La ${species} è in riproduzione!`
-        });
+        res.json({ success: true, species, status: reproductionStatus[species], pytho_says: `🌿 La ${species} è in riproduzione!` });
     } else {
-        res.status(404).json({
-            success: false,
-            error: `Specie ${species} non trovata`,
-            available_species: Object.keys(reproductionStatus)
-        });
+        res.status(404).json({ success: false, error: `Specie ${species} non trovata` });
     }
 });
 
-// ROTTA: Stato riproduzione
 app.get('/api/pytho/reproduction-status', (req, res) => {
     const total = Object.keys(reproductionStatus).length;
     const completed = Object.values(reproductionStatus).filter(s => s.progress >= 100).length;
     const inProgress = Object.values(reproductionStatus).filter(s => s.progress > 0 && s.progress < 100).length;
-    
     res.json({
         success: true,
         total_species: total,
@@ -498,29 +452,30 @@ app.get('/api/pytho/reproduction-status', (req, res) => {
     });
 });
 
-// ROTTA: Completa riproduzione
 app.post('/api/pytho/complete-reproduction/:species', (req, res) => {
     const { species } = req.params;
-    
     if (reproductionStatus[species]) {
         reproductionStatus[species].status = "✅ Riprodotta!";
         reproductionStatus[species].progress = 100;
-        
         temporalMemory.push({
             event: `🌿 Specie riprodotta: ${species}`,
             timestamp: new Date().toISOString()
         });
-        
         res.json({
             success: true,
-            species: species,
+            species,
             status: reproductionStatus[species],
             pytho_says: `🎉 La ${species} è stata riprodotta con successo!`
         });
     } else {
-        res.status(404).json({
-            success: false,
-            error: `Specie ${species} non trovata`
-        });
+        res.status(404).json({ success: false, error: `Specie ${species} non trovata` });
     }
+});
+
+// Avvia il server
+app.listen(port, () => {
+    console.log('🚀 Pytho Temporal su porta ' + port);
+    console.log('👽 Macchina del tempo attiva!');
+    console.log('🛸 http://localhost:' + port + '/temporal');
+    console.log('📊 http://localhost:' + port + '/api/dashboard');
 });
