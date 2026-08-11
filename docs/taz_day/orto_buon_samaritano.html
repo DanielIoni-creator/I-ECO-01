@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱 Orto del Buon Samaritano</title>
+    <style>
+        /* === STILE GENERALE === */
+        /* Colori caldi: terra, verde, legno, per un look accogliente e naturale */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5efe6; /* beige chiaro come la terra */
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            color: #2d2a24;
+        }
+
+        /* === INTESTAZIONE === */
+        .header {
+            text-align: center;
+            padding: 20px 0 10px 0;
+            border-bottom: 3px solid #7d9b6e;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            color: #3d5a2e;
+            letter-spacing: 1px;
+        }
+
+        .header h1 span {
+            font-size: 1.2em;
+        }
+
+        .header p {
+            color: #6b5e4a;
+            font-style: italic;
+            margin-top: 4px;
+            font-size: 0.95em;
+        }
+
+        /* === CARD / RIQUADRI === */
+        .card {
+            background: #ffffffd9;
+            backdrop-filter: blur(2px);
+            border-radius: 18px;
+            padding: 20px 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 18px rgba(90, 70, 40, 0.08);
+            border: 1px solid #e2d6c4;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.2em;
+            color: #3d5a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        /* === FORM === */
+        label {
+            display: block;
+            font-weight: 500;
+            margin-top: 14px;
+            margin-bottom: 4px;
+            color: #3d352b;
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 40px;
+            border: 1px solid #cfc1ae;
+            background: #fcf9f5;
+            font-size: 1em;
+            transition: 0.2s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #7d9b6e;
+            box-shadow: 0 0 0 3px rgba(125, 155, 110, 0.25);
+            background: #ffffff;
+        }
+
+        /* === BOTTONI === */
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .btn {
+            flex: 1 1 auto;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1em;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #e8e0d6;
+            color: #2d2a24;
+        }
+
+        .btn-primary {
+            background: #5f7d4a;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #4d6a3a;
+            transform: scale(1.01);
+        }
+
+        .btn-warning {
+            background: #d9a84c;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #c4963e;
+            transform: scale(1.01);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #b09b82;
+        }
+        .btn-outline:hover {
+            background: #f0e8de;
+        }
+
+        /* === LISTA PIANTE === */
+        .plant-list {
+            margin-top: 6px;
+        }
+
+        .plant-item {
+            background: #f7f2ea;
+            border-radius: 60px;
+            padding: 12px 18px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 6px solid #7d9b6e;
+            transition: 0.15s;
+        }
+
+        .plant-item:hover {
+            background: #f2ebe0;
+        }
+
+        .plant-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .plant-name {
+            font-weight: 600;
+            color: #2d4022;
+            font-size: 1.05em;
+        }
+
+        .plant-dates {
+            font-size: 0.85em;
+            color: #5f5546;
+        }
+
+        .plant-dates .harvest {
+            font-weight: 600;
+            color: #3d7a2e;
+        }
+
+        .plant-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.8em;
+            border-radius: 30px;
+            border: none;
+            background: #d9d0c2;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .btn-sm:hover {
+            background: #c9beb0;
+        }
+
+        .btn-sm-danger {
+            background: #e6c0b0;
+        }
+        .btn-sm-danger:hover {
+            background: #dbaa98;
+        }
+
+        /* === AVVISO VOLONTARI === */
+        .alert-box {
+            background: #fcf3e0;
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin-top: 18px;
+            border-left: 6px solid #d9a84c;
+            display: none;
+            color: #4d3f2e;
+        }
+
+        .alert-box.show {
+            display: block;
+        }
+
+        .alert-box strong {
+            color: #8a6d3b;
+        }
+
+        /* === STATISTICHE === */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 6px 0;
+        }
+
+        .stats span {
+            background: #eae2d6;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.9em;
+            color: #3d352b;
+        }
+
+        .stats .num {
+            font-weight: 700;
+            color: #3d5a2e;
+        }
+
+        /* === PIEDE === */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.8em;
+            color: #8a7d6b;
+            border-top: 1px solid #ded3c4;
+            padding-top: 18px;
+        }
+
+        .footer a {
+            color: #5f7d4a;
+            text-decoration: none;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 480px) {
+            .btn-group {
+                flex-direction: column;
+            }
+            .plant-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .plant-actions {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== INTESTAZIONE ===== -->
+    <div class="header">
+        <h1>🌱 Orto del <br>Buon Samaritano</h1>
+        <p>«Chi ha due tuniche, ne dia una a chi non ne ha» (Lc 3,11)</p>
+    </div>
+
+    <!-- ===== FORM: AGGIUNGI PIANTA ===== -->
+    <div class="card">
+        <div class="card-title">🌿 Nuova Pianta</div>
+
+        <label for="nomePianta">Nome della pianta</label>
+        <input type="text" id="nomePianta" placeholder="es. Pomodoro, Basilico, Zucchina" />
+
+        <label for="dataSemina">📅 Data di semina</label>
+        <input type="date" id="dataSemina" />
+
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="aggiungiPianta()">➕ Aggiungi pianta</button>
+            <button class="btn btn-warning" onclick="avvisaVolontari()">📢 Avvisa Volontari</button>
+        </div>
+
+        <!-- Avviso volontari (inizialmente nascosto) -->
+        <div id="alertBox" class="alert-box">
+            <strong>📢 Avviso inviato ai volontari!</strong><br>
+            Grazie per il tuo servizio. 🙏
+        </div>
+    </div>
+
+    <!-- ===== LISTA PIANTE ===== -->
+    <div class="card">
+        <div class="card-title">📋 Le tue piante</div>
+        <div id="listaPiante" class="plant-list">
+            <p style="color:#8a7d6b; font-style:italic; text-align:center; padding:8px 0;">
+                Non ci sono ancora piante.<br>Aggiungi la prima! 🌱
+            </p>
+        </div>
+
+        <!-- Statistiche -->
+        <div class="stats" id="statsContainer" style="margin-top:12px;">
+            <span>🌱 Piante: <span class="num" id="countPiante">0</span></span>
+            <span>⏳ In attesa: <span class="num" id="countInAttesa">0</span></span>
+            <span>🍅 Raccolte: <span class="num" id="countRaccolte">0</span></span>
+        </div>
+    </div>
+
+    <!-- ===== PIEDE ===== -->
+    <div class="footer">
+        <p>🙏 Progetto MyZubster · <a href="https://github.com/DanielIoni-creator/I-ECO-01" target="_blank">GitHub</a></p>
+        <p style="margin-top:4px; font-size:0.75em;">«Se Hera non costruisce i robot, li costruisce la Chiesa»</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ===== JAVASCRIPT (tutto qui, nessun database) ===== -->
+    <script>
+        // === ARRAY CHE CONTIENE LE PIANTE (in memoria) ===
+        let piante = [];
+
+        // === RIFERIMENTI AGLI ELEMENTI HTML ===
+        const inputNome = document.getElementById('nomePianta');
+        const inputData = document.getElementById('dataSemina');
+        const containerLista = document.getElementById('listaPiante');
+        const alertBox = document.getElementById('alertBox');
+
+        // === FUNZIONE PER AGGIUNGERE UNA PIANTA ===
+        function aggiungiPianta() {
+            const nome = inputNome.value.trim();
+            const dataSemina = inputData.value;
+
+            // Validazione: controlla che i campi siano compilati
+            if (nome === '') {
+                alert('🙏 Per favore, scrivi il nome della pianta.');
+                inputNome.focus();
+                return;
+            }
+            if (dataSemina === '') {
+                alert('📅 Per favore, seleziona la data di semina.');
+                inputData.focus();
+                return;
+            }
+
+            // Calcola la data di raccolta (es. +60 giorni dalla semina)
+            const data = new Date(dataSemina);
+            data.setDate(data.getDate() + 60); // 60 giorni per molte piante
+            const dataRaccolta = data.toLocaleDateString('it-IT', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+
+            // Crea l'oggetto pianta
+            const nuovaPianta = {
+                id: Date.now(), // ID unico basato sul timestamp
+                nome: nome,
+                dataSemina: dataSemina,
+                dataRaccolta: dataRaccolta,
+                raccolta: false // false = non ancora raccolta
+            };
+
+            // Aggiunge la pianta all'array
+            piante.push(nuovaPianta);
+
+            // Resetta i campi del form
+            inputNome.value = '';
+            inputData.value = '';
+            inputNome.focus();
+
+            // Aggiorna la lista a schermo
+            aggiornaLista();
+        }
+
+        // === FUNZIONE PER ELIMINARE UNA PIANTA ===
+        function eliminaPianta(id) {
+            if (confirm('🗑️ Sei sicuro di voler rimuovere questa pianta?')) {
+                // Filtra l'array: tiene solo le piante con ID diverso
+                piante = piante.filter(p => p.id !== id);
+                aggiornaLista();
+            }
+        }
+
+        // === FUNZIONE PER SEGNARE UNA PIANTA COME RACCOLTA ===
+        function raccogliPianta(id) {
+            const pianta = piante.find(p => p.id === id);
+            if (pianta) {
+                pianta.raccolta = true;
+                aggiornaLista();
+                // Mostra un piccolo messaggio di conferma
+                alert('🍅 Ottimo! Hai raccolto ' + pianta.nome + '.');
+            }
+        }
+
+        // === FUNZIONE CHE DISEGNA LA LISTA DELLE PIANTE ===
+        function aggiornaLista() {
+            // Se non ci sono piante, mostra il messaggio vuoto
+            if (piante.length === 0) {
+                containerLista.innerHTML = `
+                    <p style="color:#8a7d6b; font-style:italic; text-align:center; padding:8px 0;">
+                        Non ci sono ancora piante.<br>Aggiungi la prima! 🌱
+                    </p>
+                `;
+            } else {
+                // Costruisce il codice HTML per ogni pianta
+                let html = '';
+                piante.forEach(p => {
+                    // Icona diversa se è già raccolta
+                    const icona = p.raccolta ? '✅' : '🌱';
+                    const styleRaccolta = p.raccolta ? 'opacity:0.6;' : '';
+
+                    html += `
+                        <div class="plant-item" style="${styleRaccolta}">
+                            <div class="plant-info">
+                                <span class="plant-name">${icona} ${p.nome}</span>
+                                <span class="plant-dates">
+                                    Semina: ${new Date(p.dataSemina).toLocaleDateString('it-IT')} &nbsp;|&nbsp;
+                                    <span class="harvest">🍅 Raccolta: ${p.dataRaccolta}</span>
+                                    ${p.raccolta ? '<span style="color:#3d7a2e;"> ✅ Raccolta</span>' : ''}
+                                </span>
+                            </div>
+                            <div class="plant-actions">
+                                ${!p.raccolta ? `<button class="btn-sm" onclick="raccogliPianta(${p.id})">🍅 Raccogli</button>` : ''}
+                                <button class="btn-sm btn-sm-danger" onclick="eliminaPianta(${p.id})">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                containerLista.innerHTML = html;
+            }
+
+            // === AGGIORNA LE STATISTICHE ===
+            const totali = piante.length;
+            const inAttesa = piante.filter(p => !p.raccolta).length;
+            const raccolte = piante.filter(p => p.raccolta).length;
+
+            document.getElementById('countPiante').textContent = totali;
+            document.getElementById('countInAttesa').textContent = inAttesa;
+            document.getElementById('countRaccolte').textContent = raccolte;
+
+            // Salva i dati in localStorage per mantenerli anche dopo un refresh
+            salvaDati();
+        }
+
+        // === AVVISA I VOLONTARI ===
+        function avvisaVolontari() {
+            // Controlla se ci sono piante da raccogliere
+            const daRaccogliere = piante.filter(p => !p.raccolta);
+
+            if (daRaccogliere.length === 0) {
+                alert('🙏 Tutte le piante sono già state raccolte! Grazie ai volontari.');
+                return;
+            }
+
+            // Mostra il box di avviso con i dettagli
+            const nomi = daRaccogliere.map(p => p.nome).join(', ');
+            alertBox.innerHTML = `
+                <strong>📢 Avviso inviato ai volontari!</strong><br>
+                <span style="display:block; margin-top:6px;">
+                    Piante da raccogliere: <strong>${nomi}</strong>
+                </span>
+                <span style="display:block; margin-top:4px; font-size:0.9em; color:#5f5546;">
+                    🙏 Grazie per il tuo servizio alla comunità.
+                </span>
+            `;
+            alertBox.classList.add('show');
+
+            // Nasconde automaticamente il messaggio dopo 7 secondi
+            setTimeout(() => {
+                alertBox.classList.remove('show');
+            }, 7000);
+        }
+
+        // === SALVA I DATI NEL BROWSER (localStorage) ===
+        function salvaDati() {
+            try {
+                const dati = JSON.stringify(piante);
+                localStorage.setItem('orto_samaritano', dati);
+            } catch (e) {
+                // Se c'è un errore (es. spazio esaurito), ignoriamo
+            }
+        }
+
+        // === CARICA I DATI DAL BROWSER (localStorage) ===
+        function caricaDati() {
+            try {
+                const dati = localStorage.getItem('orto_samaritano');
+                if (dati) {
+                    piante = JSON.parse(dati);
+                    aggiornaLista();
+                }
+            } catch (e) {
+                // Se i dati sono corrotti, li ignoriamo
+            }
+        }
+
+        // === CARICA AUTOMATICAMENTE I DATI ALL'AVVIO ===
+        caricaDati();
+
+        // === PERMETTE DI AGGIUNGERE UNA PIANTA CON IL TASTO "INVIO" ===
+        inputData.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                aggiungiPianta();
+            }
+        });
+        inputNome.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                aggiungiPianta();
+            }
+        });
+
+        // === PICCOLA NOTA: LO SVILUPPATORE PUÒ USARE LA CONSOLE PER DEBUG ===
+        console.log('🌱 App Orto del Buon Samaritano caricata!');
+        console.log('📦 Per vedere i dati: localStorage.getItem("orto_samaritano")');
+    </script>
+</body>
+</html>
