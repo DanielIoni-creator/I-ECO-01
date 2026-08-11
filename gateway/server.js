@@ -48,7 +48,7 @@ app.post('/api/cardputer/payment/create', (req, res) => {
     }
 
     const payment_id = 'pay_' + Date.now() + Math.random().toString(36).substr(2, 5);
-    const address = '45M4DW1ug8bdQowWpxucTpgsfjLbVxbYaAra79VewmBobuuhgqTjyD4R3DzpqLM2veiphcB16n24qN1QbLg3y2PYGK3Qkoe';
+    const address = 'xmr_641340aa6aa86029e833a5e5f5fb2b31';
     
     const newPayment = {
         id: payment_id,
