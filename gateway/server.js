@@ -5,8 +5,29 @@ const cors = require('cors');
 const app = express();
 const port = 3000;
 
-app.use(cors());
+// Configurazione CORS per il dominio
+const corsOptions = {
+    origin: [
+        'http://localhost:3000',
+        'http://localhost',
+        'http://myzubster.com',
+        'http://www.myzubster.com',
+        'https://myzubster.com',
+        'https://www.myzubster.com',
+        'http://209.227.239.219'
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    credentials: true
+};
+app.use(cors(corsOptions));
+
 app.use(express.json());
+
+// Servi la pagina index.html per la root
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // File di persistenza
 const DATA_FILE = path.join(__dirname, 'payments.json');
@@ -242,7 +263,46 @@ app.get('/api/myz/stats', (req, res) => {
     });
 });
 
-// ROTTA: Dashboard riepilogo
+// ROTTA: Sincronizza pagamenti MYZ
+app.post('/api/myz/sync', (req, res) => {
+    try {
+        const myzPayments = payments.filter(p => 
+            p.currency === 'MYZ' && 
+            p.status === 'paid' && 
+            !p.synced_to_myz
+        );
+
+        if (myzPayments.length === 0) {
+            return res.json({
+                success: true,
+                message: 'Nessun pagamento MYZ da sincronizzare',
+                synced: 0
+            });
+        }
+
+        let syncedCount = 0;
+        for (const payment of myzPayments) {
+            payment.synced_to_myz = true;
+            payment.synced_at = new Date().toISOString();
+            syncedCount++;
+        }
+
+        savePayments(payments);
+
+        res.json({
+            success: true,
+            message: syncedCount + ' pagamenti MYZ sincronizzati',
+            synced: syncedCount
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// ROTTA: Dashboard
 app.get('/api/dashboard', (req, res) => {
     const totalXMR = payments
         .filter(p => p.currency === 'XMR' && p.status === 'paid')
@@ -269,51 +329,11 @@ app.get('/api/dashboard', (req, res) => {
 });
 
 // Avvia server
-app.listen(port, () => {
-    console.log('🚀 Gateway MyZubster in esecuzione su http://localhost:' + port);
+app.listen(port, '0.0.0.0', () => {
+    console.log('🚀 Gateway MyZubster in esecuzione su http://0.0.0.0:' + port);
     console.log('📁 Dati salvati su: ' + DATA_FILE);
     console.log('📊 Pagamenti attuali: ' + payments.length);
     console.log('💰 MYZ Wallet: ' + MYZ_WALLET_ADDRESS);
     console.log('💰 XMR Wallet: ' + XMR_WALLET_ADDRESS);
     console.log('💳 Platform Fee: ' + PLATFORM_FEE + '%');
-});
-
-// ROTTA: Sincronizza pagamenti MYZ con MyZubster
-app.post('/api/myz/sync', (req, res) => {
-    try {
-        const myzPayments = payments.filter(p => 
-            p.currency === 'MYZ' && 
-            p.status === 'paid' && 
-            !p.synced_to_myz
-        );
-
-        if (myzPayments.length === 0) {
-            return res.json({
-                success: true,
-                message: 'Nessun pagamento MYZ da sincronizzare',
-                synced: 0
-            });
-        }
-
-        let syncedCount = 0;
-        for (const payment of myzPayments) {
-            // Simula sincronizzazione con MyZubster
-            payment.synced_to_myz = true;
-            payment.synced_at = new Date().toISOString();
-            syncedCount++;
-        }
-
-        savePayments(payments);
-
-        res.json({
-            success: true,
-            message: syncedCount + ' pagamenti MYZ sincronizzati',
-            synced: syncedCount
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
 });

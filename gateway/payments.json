@@ -70,5 +70,17 @@
     "synced_to_myz": true,
     "updated_at": "2026-08-11T09:08:38.264Z",
     "synced_at": "2026-08-11T09:09:55.741Z"
+  },
+  {
+    "id": "myz_17864429739688m4da",
+    "tag_id": "TEST",
+    "amount": 10,
+    "currency": "MYZ",
+    "address": "myz_77d6ddd05bf30e8fef178ac1b5b5e112",
+    "fee": 0.2,
+    "net_amount": 9.8,
+    "status": "pending",
+    "created_at": "2026-08-11T10:09:33.968Z",
+    "synced_to_myz": false
   }
 ]
