@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+<<<<<<< HEAD
 /**
  * @title WelfareContract
  * @dev Contratto per la gestione collettiva di fondi per eventi TAZ
@@ -15,11 +16,17 @@ contract WelfareContract {
     event CrewAdded(address indexed member);
     event CrewRemoved(address indexed member);
     event FundsDeposited(address indexed sender, uint256 amount);
+=======
+contract WelfareContract {
+    address public owner;
+    mapping(address => uint256) public shares;
+>>>>>>> 0c4fe38 (feat: add Welfare smart contract #7)
     
     constructor() {
         owner = msg.sender;
     }
     
+<<<<<<< HEAD
     modifier onlyOwner() {
         require(msg.sender == owner, "Solo il proprietario");
         _;
@@ -87,5 +94,13 @@ contract WelfareContract {
      */
     function getCrewList() external view returns (address[] memory) {
         return crewList;
+=======
+    function distribute(address[] memory recipients) public payable {
+        require(msg.sender == owner, "Solo owner");
+        uint256 share = msg.value / recipients.length;
+        for (uint i = 0; i < recipients.length; i++) {
+            shares[recipients[i]] += share;
+        }
+>>>>>>> 0c4fe38 (feat: add Welfare smart contract #7)
     }
 }

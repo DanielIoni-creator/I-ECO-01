@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+import sys
+sys.path.insert(0, '/tmp/I-ECO-01/robots/shared/vision')
+from smart_camera import HeraSecurityVision
+
+security = HeraSecurityVision()
+security.check_intruder()
