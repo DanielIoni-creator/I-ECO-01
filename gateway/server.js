@@ -277,3 +277,43 @@ app.listen(port, () => {
     console.log('💰 XMR Wallet: ' + XMR_WALLET_ADDRESS);
     console.log('💳 Platform Fee: ' + PLATFORM_FEE + '%');
 });
+
+// ROTTA: Sincronizza pagamenti MYZ con MyZubster
+app.post('/api/myz/sync', (req, res) => {
+    try {
+        const myzPayments = payments.filter(p => 
+            p.currency === 'MYZ' && 
+            p.status === 'paid' && 
+            !p.synced_to_myz
+        );
+
+        if (myzPayments.length === 0) {
+            return res.json({
+                success: true,
+                message: 'Nessun pagamento MYZ da sincronizzare',
+                synced: 0
+            });
+        }
+
+        let syncedCount = 0;
+        for (const payment of myzPayments) {
+            // Simula sincronizzazione con MyZubster
+            payment.synced_to_myz = true;
+            payment.synced_at = new Date().toISOString();
+            syncedCount++;
+        }
+
+        savePayments(payments);
+
+        res.json({
+            success: true,
+            message: syncedCount + ' pagamenti MYZ sincronizzati',
+            synced: syncedCount
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});

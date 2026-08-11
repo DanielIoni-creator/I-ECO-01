@@ -56,5 +56,19 @@
     "address": "xmr_641340aa6aa86029e833a5e5f5fb2b31",
     "status": "pending",
     "created_at": "2026-08-11T08:54:53.257Z"
+  },
+  {
+    "id": "myz_1786439282317f4dl4",
+    "tag_id": "MYZ-TEST-003",
+    "amount": 10,
+    "currency": "MYZ",
+    "address": "myz_77d6ddd05bf30e8fef178ac1b5b5e112",
+    "fee": 0.2,
+    "net_amount": 9.8,
+    "status": "paid",
+    "created_at": "2026-08-11T09:08:02.317Z",
+    "synced_to_myz": true,
+    "updated_at": "2026-08-11T09:08:38.264Z",
+    "synced_at": "2026-08-11T09:09:55.741Z"
   }
 ]
