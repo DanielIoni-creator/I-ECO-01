@@ -31,3 +31,4 @@ temp/
 *.swo
 wallet-credentials.json
 .env
+server.js.part
