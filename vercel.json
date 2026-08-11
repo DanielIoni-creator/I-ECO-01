@@ -3,23 +3,23 @@
   "routes": [
     {
       "src": "/chat",
-      "dest": "/gateway/pytho-chat.html"
+      "dest": "/api/index.js"
     },
     {
       "src": "/temporal",
-      "dest": "/gateway/server.js"
+      "dest": "/api/index.js"
     },
     {
       "src": "/mappa-globale",
-      "dest": "/gateway/server.js"
+      "dest": "/api/index.js"
     },
     {
       "src": "/api/(.*)",
-      "dest": "/gateway/server.js"
+      "dest": "/api/index.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/gateway/server.js"
+      "dest": "/api/index.js"
     }
   ],
   "env": {
