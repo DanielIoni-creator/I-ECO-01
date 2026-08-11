@@ -1,15 +1,33 @@
+cat > /opt/I-ECO-01/vercel.json << 'EOF'
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node"
-    }
-  ],
   "routes": [
     {
+      "src": "/chat",
+      "dest": "/gateway/pytho-chat.html"
+    },
+    {
+      "src": "/temporal",
+      "dest": "/gateway/server.js"
+    },
+    {
+      "src": "/mappa-globale",
+      "dest": "/gateway/server.js"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/gateway/server.js"
+    },
+    {
       "src": "/(.*)",
-      "dest": "api/index.js"
+      "dest": "/gateway/server.js"
     }
-  ]
+  ],
+  "env": {
+    "MYZUBSTER_WALLET_ADDRESS": "myz_77d6ddd05bf30e8fef178ac1b5b5e112",
+    "MYZUBSTER_XMR_WALLET_ADDRESS": "xmr_641340aa6aa86029e833a5e5f5fb2b31",
+    "PLATFORM_FEE": "2",
+    "NODE_ENV": "production"
+  }
 }
+EOF
