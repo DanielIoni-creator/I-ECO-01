@@ -29,3 +29,5 @@ temp/
 .idea/
 *.swp
 *.swo
+wallet-credentials.json
+.env
