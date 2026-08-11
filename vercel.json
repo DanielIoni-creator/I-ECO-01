@@ -1,0 +1,40 @@
+{
+  "version": 2,
+  "name": "myzubster-gateway",
+  "builds": [
+    {
+      "src": "gateway/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/gateway/server.js"
+    },
+    {
+      "src": "/temporal",
+      "dest": "/gateway/server.js"
+    },
+    {
+      "src": "/mappa-globale",
+      "dest": "/gateway/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/gateway/server.js"
+    }
+  ],
+  "env": {
+    "MYZUBSTER_WALLET_ADDRESS": "myz_77d6ddd05bf30e8fef178ac1b5b5e112",
+    "MYZUBSTER_XMR_WALLET_ADDRESS": "xmr_641340aa6aa86029e833a5e5f5fb2b31",
+    "PLATFORM_FEE": "2",
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "gateway/server.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}

@@ -1,6 +1,17 @@
 {
+  "name": "myzubster-gateway",
+  "version": "3.0.0",
+  "description": "MyZubster Gateway - Pytho Temporal",
+  "main": "gateway/server.js",
+  "scripts": {
+    "start": "node gateway/server.js",
+    "vercel-build": "echo 'Building for Vercel...'"
+  },
   "dependencies": {
-    "json2csv": "^6.0.0-alpha.2",
-    "qrcode": "^1.5.4"
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
