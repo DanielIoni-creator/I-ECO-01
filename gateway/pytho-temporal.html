@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head><title>⏳ Pytho Temporal</title>
+<link rel="stylesheet" href="/temporal.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span class="alien">👽</span>
+        <h1>⏳ PYTHO TEMPORAL</h1>
+        <p>🛸 La macchina del tempo open source</p>
+    </div>
+
+    <div class="flux-status">
+        <div class="flux-item"><span>⚡ Flux</span><span class="value" id="flux">1.21 GW</span></div>
+        <div class="flux-item"><span>🟢 Stato</span><span class="value" id="status">Carico</span></div>
+        <div class="flux-item"><span>🔋 Carica</span><span class="value" id="charge">100%</span></div>
+    </div>
+
+    <div class="controls">
+        <h3>🛸 Viaggia nel tempo</h3>
+        <input type="text" id="dest" placeholder="Destinazione" value="Orto Botanico di Roma">
+        <input type="number" id="year" placeholder="Anno" value="2024">
+        <button onclick="travel()">🚀 Viaggia!</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <div class="timeline">
+        <h3>🌌 Timeline</h3>
+        <div id="timeline"></div>
+    </div>
+
+    <div class="links">
+        <a href="/">🏠 Home</a>
+        <a href="/api/dashboard">📊 Dashboard</a>
+    </div>
+</div>
+<script src="/temporal.js"></script>
+</body>
+</html>

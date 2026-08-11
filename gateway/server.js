@@ -3,107 +3,213 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 const app = express();
-const port = 3000;
+const port = 3001;
 
-// Configurazione CORS per il dominio
-const corsOptions = {
-    origin: [
-        'http://localhost:3000',
-        'http://localhost',
-        'http://myzubster.com',
-        'http://www.myzubster.com',
-        'https://myzubster.com',
-        'https://www.myzubster.com',
-        'http://209.227.239.219'
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    credentials: true
-};
-app.use(cors(corsOptions));
-
+app.use(cors());
 app.use(express.json());
-
-// Servi la pagina index.html per la root
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
 
 // File di persistenza
 const DATA_FILE = path.join(__dirname, 'payments.json');
 
 // Configurazione wallet
-const MYZ_WALLET_ADDRESS = process.env.MYZUBSTER_WALLET_ADDRESS || 'myz_77d6ddd05bf30e8fef178ac1b5b5e112';
-const XMR_WALLET_ADDRESS = process.env.MYZUBSTER_XMR_WALLET_ADDRESS || 'xmr_641340aa6aa86029e833a5e5f5fb2b31';
-const PLATFORM_FEE = parseFloat(process.env.PLATFORM_FEE) || 2;
+const MYZ_WALLET = 'myz_77d6ddd05bf30e8fef178ac1b5b5e112';
+const XMR_WALLET = 'xmr_641340aa6aa86029e833a5e5f5fb2b31';
+const PLATFORM_FEE = 2;
 
-// Carica dati salvati
+// Carica pagamenti
 function loadPayments() {
     try {
         if (fs.existsSync(DATA_FILE)) {
-            const data = fs.readFileSync(DATA_FILE, 'utf8');
-            return JSON.parse(data);
+            return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
         }
-    } catch (error) {
-        console.error('Errore nel caricamento dati:', error);
-    }
+    } catch (e) {}
     return [];
 }
 
-// Salva dati
-function savePayments(payments) {
-    try {
-        fs.writeFileSync(DATA_FILE, JSON.stringify(payments, null, 2));
-    } catch (error) {
-        console.error('Errore nel salvataggio dati:', error);
-    }
+function savePayments(p) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(p, null, 2));
 }
 
-// Inizializza pagamenti
 let payments = loadPayments();
 
 // ============================================
-// ROTTE XMR (Monero)
+// MEMORIA TEMPORALE DI PYTHO
 // ============================================
 
-// ROTTA: Crea nuovo pagamento XMR
-app.post('/api/cardputer/payment/create', (req, res) => {
-    const { tag_id, amount } = req.body;
+const temporalMemory = [];
+const timelineEvents = [
+    { event: '👽 Pytho creato', year: '2024', status: '✅' },
+    { event: '🌿 Primo orto botanico', year: '2024', status: '✅' },
+    { event: '🏛️ Comune di Firenze', year: '2024', status: '✅' },
+    { event: '🚀 Gateway live', year: '2024', status: '✅' },
+    { event: '🛸 Pytho viaggia nel tempo', year: '2124', status: '⏳' },
+    { event: '🌌 Pytho diventa leggenda', year: '3000', status: '🌀' }
+];
 
+// ============================================
+// ROTTE HTML
+// ============================================
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/temporal', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pytho-temporal.html'));
+});
+
+app.get('/temporal.css', (req, res) => {
+    res.sendFile(path.join(__dirname, 'temporal.css'));
+});
+
+app.get('/temporal.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'temporal.js'));
+});
+
+// ============================================
+// ROTTE PYTHO TEMPORAL
+// ============================================
+
+// ROTTA: Viaggia nel tempo
+app.post('/api/pytho/timetravel', (req, res) => {
+    const { destination, year } = req.body;
+    const result = {
+        timestamp: new Date().toISOString(),
+        destination: destination || 'Orto Botanico di Roma',
+        year: year || 2024,
+        status: '🛸 Viaggio completato!',
+        pytho: '👽 Il tempo è un concetto umano...',
+        flux: '1.21 GW ⚡'
+    };
+    temporalMemory.push({ event: `Viaggio al ${destination} (${year})`, timestamp: new Date().toISOString() });
+    res.json({ success: true, travel: result });
+});
+
+// ROTTA: Timeline di Pytho
+app.get('/api/pytho/timeline', (req, res) => {
+    res.json({
+        success: true,
+        timeline: timelineEvents,
+        temporal_memory: temporalMemory,
+        status: '🟢 Attivo'
+    });
+});
+
+// ROTTA: Flux Capacitor
+app.get('/api/pytho/flux', (req, res) => {
+    res.json({
+        success: true,
+        flux: {
+            power: '1.21 GW',
+            charge: Math.floor(Math.random() * 100) + 1 + '%',
+            status: '🔋 Carico'
+        }
+    });
+});
+
+// ROTTA: Riconoscimento vocale - VERSIONE CORRETTA
+app.post('/api/pytho/voice', (req, res) => {
+    const { command } = req.body;
+    
+    if (!command) {
+        return res.status(400).json({
+            success: false,
+            error: 'Nessun comando vocale ricevuto'
+        });
+    }
+    
+    // Estrai anno (4 cifre)
+    const yearMatch = command.match(/\b(\d{4})\b/);
+    // Estrai destinazione (parole dopo "destinazione", "a", "al", "nel")
+    const destMatch = command.match(/(?:destinazione|a|al|nel)\s+([a-zA-Z\s]+)/i);
+    
+    let response = {
+        success: true,
+        command: command,
+        pytho_says: '👽 Comando ricevuto!',
+        action: null
+    };
+    
+    if (yearMatch) {
+        const year = yearMatch[1];
+        const destination = destMatch ? destMatch[1].trim() : 'Orto Botanico di Roma';
+        
+        response.pytho_says = `🛸 Viaggio al ${destination} nel ${year} in corso...`;
+        response.action = 'timetravel';
+        response.year = year;
+        response.destination = destination;
+        
+        temporalMemory.push({
+            event: `🗣️ Comando vocale: "${command}" → ${destination} (${year})`,
+            timestamp: new Date().toISOString()
+        });
+        
+        res.json({
+            ...response,
+            travel: {
+                destination: destination,
+                year: parseInt(year),
+                status: '✅ Viaggio vocale completato!',
+                flux: '1.21 GW ⚡'
+            }
+        });
+    } else {
+        response.pytho_says = "👽 Non ho capito l'anno. Prova: 'Pytho, viaggia al 2124 a Firenze'";
+        res.json(response);
+    }
+});
+
+// ============================================
+// ROTTE PAGAMENTI
+// ============================================
+
+// ROTTA: Crea pagamento MYZ
+app.post('/api/myz/payment/create', (req, res) => {
+    const { tag_id, amount } = req.body;
+    
     if (!tag_id || !amount) {
         return res.status(400).json({
             success: false,
             error: 'tag_id e amount sono obbligatori'
         });
     }
-
-    const payment_id = 'pay_' + Date.now() + Math.random().toString(36).substr(2, 5);
-    const address = XMR_WALLET_ADDRESS;
-
-    const newPayment = {
-        id: payment_id,
-        tag_id: tag_id,
+    
+    const fee = (parseFloat(amount) * PLATFORM_FEE) / 100;
+    const netAmount = parseFloat(amount) - fee;
+    
+    const payment = {
+        id: 'myz_' + Date.now() + Math.random().toString(36).substr(2, 5),
+        tag_id,
         amount: parseFloat(amount),
-        currency: 'XMR',
-        address: address,
+        currency: 'MYZ',
+        address: MYZ_WALLET,
+        fee: fee,
+        net_amount: netAmount,
         status: 'pending',
         created_at: new Date().toISOString()
     };
-
-    payments.push(newPayment);
+    
+    payments.push(payment);
     savePayments(payments);
+    res.json({ success: true, ...payment });
+});
 
+// ROTTA: Dashboard
+app.get('/api/dashboard', (req, res) => {
+    const total = payments.reduce((s, p) => s + (p.net_amount || p.amount), 0);
     res.json({
         success: true,
-        payment_id: payment_id,
-        address: address,
-        amount: parseFloat(amount),
-        qr_code: 'monero:' + address + '?amount=' + amount,
-        tag: tag_id
+        dashboard: {
+            total_payments: payments.length,
+            pending: payments.filter(p => p.status === 'pending').length,
+            paid: payments.filter(p => p.status === 'paid').length,
+            total_myz: total,
+            wallet: { myz: MYZ_WALLET, xmr: XMR_WALLET }
+        }
     });
 });
 
-// ROTTA: Lista tutti i pagamenti
+// ROTTA: Lista pagamenti
 app.get('/api/cardputer/payments', (req, res) => {
     res.json({
         success: true,
@@ -112,139 +218,7 @@ app.get('/api/cardputer/payments', (req, res) => {
     });
 });
 
-// ROTTA: Aggiorna stato pagamento
-app.put('/api/cardputer/payment/status/:payment_id', (req, res) => {
-    const { payment_id } = req.params;
-    const { status } = req.body;
-
-    if (!status || !['pending', 'paid', 'expired'].includes(status)) {
-        return res.status(400).json({
-            success: false,
-            error: 'Status non valido. Usa: pending, paid, expired'
-        });
-    }
-
-    const payment = payments.find(p => p.id === payment_id);
-    if (!payment) {
-        return res.status(404).json({
-            success: false,
-            error: 'Pagamento non trovato'
-        });
-    }
-
-    payment.status = status;
-    payment.updated_at = new Date().toISOString();
-    savePayments(payments);
-
-    res.json({
-        success: true,
-        payment: payment
-    });
-});
-
-// ROTTA: Ottieni pagamento specifico
-app.get('/api/cardputer/payment/:payment_id', (req, res) => {
-    const { payment_id } = req.params;
-    const payment = payments.find(p => p.id === payment_id);
-
-    if (!payment) {
-        return res.status(404).json({
-            success: false,
-            error: 'Pagamento non trovato'
-        });
-    }
-
-    res.json({
-        success: true,
-        payment: payment
-    });
-});
-
-// ROTTA: Elimina pagamento
-app.delete('/api/cardputer/payment/:payment_id', (req, res) => {
-    const { payment_id } = req.params;
-    const index = payments.findIndex(p => p.id === payment_id);
-
-    if (index === -1) {
-        return res.status(404).json({
-            success: false,
-            error: 'Pagamento non trovato'
-        });
-    }
-
-    payments.splice(index, 1);
-    savePayments(payments);
-
-    res.json({
-        success: true,
-        message: 'Pagamento eliminato'
-    });
-});
-
-// ROTTA: Recupera pagamenti per tag
-app.get('/api/cardputer/payments/tag/:tag_id', (req, res) => {
-    const { tag_id } = req.params;
-    const filtered = payments.filter(p => p.tag_id === tag_id);
-
-    res.json({
-        success: true,
-        count: filtered.length,
-        payments: filtered
-    });
-});
-
-// ============================================
-// ROTTE MYZ (MyZubster)
-// ============================================
-
-// ROTTA: Crea pagamento MYZ
-app.post('/api/myz/payment/create', (req, res) => {
-    const { tag_id, amount, currency } = req.body;
-    const curr = currency || 'MYZ';
-
-    if (!tag_id || !amount) {
-        return res.status(400).json({
-            success: false,
-            error: 'tag_id e amount sono obbligatori'
-        });
-    }
-
-    const payment_id = 'myz_' + Date.now() + Math.random().toString(36).substr(2, 5);
-    const address = curr === 'XMR' ? XMR_WALLET_ADDRESS : MYZ_WALLET_ADDRESS;
-    
-    const fee = (parseFloat(amount) * PLATFORM_FEE) / 100;
-    const netAmount = parseFloat(amount) - fee;
-
-    const newPayment = {
-        id: payment_id,
-        tag_id: tag_id,
-        amount: parseFloat(amount),
-        currency: curr,
-        address: address,
-        fee: fee,
-        net_amount: netAmount,
-        status: 'pending',
-        created_at: new Date().toISOString(),
-        synced_to_myz: false
-    };
-
-    payments.push(newPayment);
-    savePayments(payments);
-
-    res.json({
-        success: true,
-        payment_id: payment_id,
-        address: address,
-        amount: parseFloat(amount),
-        currency: curr,
-        fee: fee,
-        net_amount: netAmount,
-        qr_code: curr.toLowerCase() + ':' + address + '?amount=' + amount,
-        tag: tag_id
-    });
-});
-
-// ROTTA: Statistiche pagamenti MYZ
+// ROTTA: Statistiche MYZ
 app.get('/api/myz/stats', (req, res) => {
     const myzPayments = payments.filter(p => p.currency === 'MYZ');
     const totalMYZ = myzPayments.reduce((sum, p) => sum + (p.net_amount || p.amount), 0);
@@ -263,77 +237,13 @@ app.get('/api/myz/stats', (req, res) => {
     });
 });
 
-// ROTTA: Sincronizza pagamenti MYZ
-app.post('/api/myz/sync', (req, res) => {
-    try {
-        const myzPayments = payments.filter(p => 
-            p.currency === 'MYZ' && 
-            p.status === 'paid' && 
-            !p.synced_to_myz
-        );
+// ============================================
+// AVVIA SERVER
+// ============================================
 
-        if (myzPayments.length === 0) {
-            return res.json({
-                success: true,
-                message: 'Nessun pagamento MYZ da sincronizzare',
-                synced: 0
-            });
-        }
-
-        let syncedCount = 0;
-        for (const payment of myzPayments) {
-            payment.synced_to_myz = true;
-            payment.synced_at = new Date().toISOString();
-            syncedCount++;
-        }
-
-        savePayments(payments);
-
-        res.json({
-            success: true,
-            message: syncedCount + ' pagamenti MYZ sincronizzati',
-            synced: syncedCount
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// ROTTA: Dashboard
-app.get('/api/dashboard', (req, res) => {
-    const totalXMR = payments
-        .filter(p => p.currency === 'XMR' && p.status === 'paid')
-        .reduce((sum, p) => sum + p.amount, 0);
-    
-    const totalMYZ = payments
-        .filter(p => p.currency === 'MYZ' && p.status === 'paid')
-        .reduce((sum, p) => sum + (p.net_amount || p.amount), 0);
-
-    res.json({
-        success: true,
-        dashboard: {
-            total_payments: payments.length,
-            pending: payments.filter(p => p.status === 'pending').length,
-            paid: payments.filter(p => p.status === 'paid').length,
-            total_xmr: totalXMR,
-            total_myz: totalMYZ,
-            wallet_addresses: {
-                myz: MYZ_WALLET_ADDRESS,
-                xmr: XMR_WALLET_ADDRESS
-            }
-        }
-    });
-});
-
-// Avvia server
-app.listen(port, '0.0.0.0', () => {
-    console.log('🚀 Gateway MyZubster in esecuzione su http://0.0.0.0:' + port);
-    console.log('📁 Dati salvati su: ' + DATA_FILE);
-    console.log('📊 Pagamenti attuali: ' + payments.length);
-    console.log('💰 MYZ Wallet: ' + MYZ_WALLET_ADDRESS);
-    console.log('💰 XMR Wallet: ' + XMR_WALLET_ADDRESS);
-    console.log('💳 Platform Fee: ' + PLATFORM_FEE + '%');
+app.listen(port, () => {
+    console.log('🚀 Pytho Temporal su porta ' + port);
+    console.log('👽 Macchina del tempo attiva!');
+    console.log('🛸 http://localhost:' + port + '/temporal');
+    console.log('📊 http://localhost:' + port + '/api/dashboard');
 });

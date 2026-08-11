@@ -33,3 +33,16 @@ Ecosystem Open Source per Collettivi. No capi. Pagamenti in XMR.
 
 ### Sicurezza Android
 - **[Android Security Teryaagh](docs/resources/android-security.md)** - Repository completo sulla sicurezza Android, con roadmap, laboratori, strumenti e best practices.
+
+## 👽 Pytho - The Alien
+
+Pytho is the official mascot of MyZubster.
+- 🛸 **Role**: Guardian of the Gateway
+- 💚 **Mission**: Decentralize payments
+- 🚀 **Origin**: Open Source Community
+- 👽 **Motto**: "No capi, solo codice"
+
+![Pytho](https://myzubster.com/assets/pytho.png)
+
+---
+*Pytho watches over your transactions* 👽🛸💚
