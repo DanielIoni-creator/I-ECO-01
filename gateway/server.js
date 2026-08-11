@@ -247,3 +247,280 @@ app.listen(port, () => {
     console.log('🛸 http://localhost:' + port + '/temporal');
     console.log('📊 http://localhost:' + port + '/api/dashboard');
 });
+
+// ============================================
+// PYTHO BOTANICAL PAST REGISTRY
+// ============================================
+
+const botanicalRegistry = [];
+
+// ROTTA: Registra specie del passato
+app.post('/api/pytho/botanical-past', (req, res) => {
+    const { location, year, species, register } = req.body;
+    
+    if (!location || !year || !species) {
+        return res.status(400).json({
+            success: false,
+            error: 'Location, year e species sono obbligatori'
+        });
+    }
+    
+    const record = {
+        id: 'bot_' + Date.now() + Math.random().toString(36).substr(2, 5),
+        location: location,
+        year: year,
+        species: species,
+        register: register || false,
+        registered_at: new Date().toISOString(),
+        pytho_approved: true
+    };
+    
+    botanicalRegistry.push(record);
+    
+    temporalMemory.push({
+        event: `🌿 Registrate ${species.length} specie a ${location} (${year})`,
+        timestamp: new Date().toISOString()
+    });
+    
+    res.json({
+        success: true,
+        record: record,
+        pytho_message: '👽 La storia botanica è al sicuro!',
+        total_registered: botanicalRegistry.length
+    });
+});
+
+// ROTTA: Lista specie registrate
+app.get('/api/pytho/botanical-history', (req, res) => {
+    res.json({
+        success: true,
+        records: botanicalRegistry,
+        total: botanicalRegistry.length,
+        pytho_status: '🟢 Guardiano della storia botanica'
+    });
+});
+
+// ============================================
+// MAPPA GLOBALE DEL PASSATO
+// ============================================
+
+const globalMap = {
+    "1500": {
+        "Orto Botanico di Roma": {
+            coordinates: [41.9028, 12.4964],
+            species: ["Rosa Antica", "Lilio", "Orchidea Selvatica", "Menta Romana", "Basilico Antico", "Salvia Romana"],
+            era: "Rinascimento",
+            status: "🌿 Recuperato"
+        }
+    },
+    "1800": {
+        "Orto Botanico di Napoli": {
+            coordinates: [40.8518, 14.2681],
+            species: ["Lilio di Napoli", "Orchidea Napoletana", "Gelsomino Antico", "Violette del Vesuvio"],
+            era: "Ottocento",
+            status: "🌿 Recuperato"
+        }
+    },
+    "1900": {
+        "Orto Botanico di Palermo": {
+            coordinates: [38.1157, 13.3615],
+            species: ["Orchidea Siciliana", "Lilio di Sicilia", "Rosa Palermitana"],
+            era: "Novecento",
+            status: "🌿 Recuperato"
+        }
+    },
+    "2024": {
+        "Orto Botanico di Roma": {
+            coordinates: [41.9028, 12.4964],
+            species: ["Rosa Moderna", "Lilio Ibrido", "Orchidea Tropicale"],
+            era: "Presente",
+            status: "🌱 Attivo"
+        }
+    },
+    "2124": {
+        "Giardino del Futuro": {
+            coordinates: [45.4642, 9.1900],
+            species: ["Rosa Quantica", "Lilio Stellare", "Orchidea Temporale", "Albero di Luce"],
+            era: "Futuro",
+            status: "🛸 Scoperto"
+        }
+    },
+    "3000": {
+        "Orto Botanico Galattico": {
+            coordinates: [0, 0],
+            species: ["Rosa Galattica", "Lilio Interstellare", "Orchidea Quantica", "Fiori di Nebulosa"],
+            era: "Galattico",
+            status: "🌌 Esplorato"
+        }
+    }
+};
+
+// ROTTA: Mappa globale del passato
+app.get('/api/pytho/global-map', (req, res) => {
+    res.json({
+        success: true,
+        map: globalMap,
+        total_locations: Object.keys(globalMap).length,
+        pytho_message: "🌍 La mappa globale del passato è pronta!",
+        pytho_status: "🟢 Guardiano della storia botanica"
+    });
+});
+
+// ROTTA: Mappa per epoca
+app.get('/api/pytho/map/:year', (req, res) => {
+    const { year } = req.params;
+    
+    if (globalMap[year]) {
+        res.json({
+            success: true,
+            year: year,
+            locations: globalMap[year],
+            pytho_says: `🛸 Ecco le piante del ${year}!`
+        });
+    } else {
+        res.status(404).json({
+            success: false,
+            error: `Nessuna pianta registrata per il ${year}`,
+            available_years: Object.keys(globalMap)
+        });
+    }
+});
+
+// ROTTA: Cerca pianta per nome
+app.get('/api/pytho/search-plant/:name', (req, res) => {
+    const { name } = req.params;
+    const results = [];
+    
+    for (const [year, locations] of Object.entries(globalMap)) {
+        for (const [location, data] of Object.entries(locations)) {
+            const found = data.species.filter(s => 
+                s.toLowerCase().includes(name.toLowerCase())
+            );
+            if (found.length > 0) {
+                results.push({
+                    year: year,
+                    location: location,
+                    species: found,
+                    era: data.era,
+                    coordinates: data.coordinates
+                });
+            }
+        }
+    }
+    
+    if (results.length > 0) {
+        res.json({
+            success: true,
+            plant: name,
+            found: results,
+            total: results.length,
+            pytho_says: `👽 Ho trovato ${results.length} corrispondenze per "${name}"!`
+        });
+    } else {
+        res.json({
+            success: false,
+            plant: name,
+            found: [],
+            pytho_says: `🌿 Non ho trovato "${name}" nella mappa globale...`
+        });
+    }
+});
+
+// ROTTA: Mappa Globale HTML
+app.get('/mappa-globale', (req, res) => {
+    res.sendFile(path.join(__dirname, 'mappa-globale.html'));
+});
+
+// ============================================
+// SISTEMA DI RIPRODUZIONE SPECIE ANTICHE
+// ============================================
+
+const reproductionStatus = {
+    "Rosa Antica": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
+    "Lilio": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
+    "Orchidea Selvatica": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
+    "Menta Romana": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
+    "Basilico Antico": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
+    "Salvia Romana": { status: "🌱 In riproduzione", progress: 0, era: "1500", location: "Orto Botanico di Roma" },
+    "Lilio di Napoli": { status: "🌱 In riproduzione", progress: 0, era: "1800", location: "Orto Botanico di Napoli" },
+    "Orchidea Napoletana": { status: "🌱 In riproduzione", progress: 0, era: "1800", location: "Orto Botanico di Napoli" },
+    "Gelsomino Antico": { status: "🌱 In riproduzione", progress: 0, era: "1800", location: "Orto Botanico di Napoli" },
+    "Violette del Vesuvio": { status: "🌱 In riproduzione", progress: 0, era: "1800", location: "Orto Botanico di Napoli" },
+    "Orchidea Siciliana": { status: "🌱 In riproduzione", progress: 0, era: "1900", location: "Orto Botanico di Palermo" },
+    "Lilio di Sicilia": { status: "🌱 In riproduzione", progress: 0, era: "1900", location: "Orto Botanico di Palermo" },
+    "Rosa Palermitana": { status: "🌱 In riproduzione", progress: 0, era: "1900", location: "Orto Botanico di Palermo" },
+    "Rosa Quantica": { status: "🛸 In sviluppo", progress: 0, era: "2124", location: "Giardino del Futuro" },
+    "Lilio Stellare": { status: "🛸 In sviluppo", progress: 0, era: "2124", location: "Giardino del Futuro" },
+    "Orchidea Temporale": { status: "🛸 In sviluppo", progress: 0, era: "2124", location: "Giardino del Futuro" },
+    "Albero di Luce": { status: "🛸 In sviluppo", progress: 0, era: "2124", location: "Giardino del Futuro" },
+    "Rosa Galattica": { status: "🌌 In esplorazione", progress: 0, era: "3000", location: "Orto Botanico Galattico" },
+    "Lilio Interstellare": { status: "🌌 In esplorazione", progress: 0, era: "3000", location: "Orto Botanico Galattico" },
+    "Orchidea Quantica": { status: "🌌 In esplorazione", progress: 0, era: "3000", location: "Orto Botanico Galattico" },
+    "Fiori di Nebulosa": { status: "🌌 In esplorazione", progress: 0, era: "3000", location: "Orto Botanico Galattico" }
+};
+
+// ROTTA: Avvia riproduzione specie
+app.post('/api/pytho/reproduce/:species', (req, res) => {
+    const { species } = req.params;
+    
+    if (reproductionStatus[species]) {
+        reproductionStatus[species].status = "🌱 In riproduzione";
+        reproductionStatus[species].progress = Math.floor(Math.random() * 100) + 1;
+        
+        res.json({
+            success: true,
+            species: species,
+            status: reproductionStatus[species],
+            pytho_says: `🌿 La ${species} è in riproduzione!`
+        });
+    } else {
+        res.status(404).json({
+            success: false,
+            error: `Specie ${species} non trovata`,
+            available_species: Object.keys(reproductionStatus)
+        });
+    }
+});
+
+// ROTTA: Stato riproduzione
+app.get('/api/pytho/reproduction-status', (req, res) => {
+    const total = Object.keys(reproductionStatus).length;
+    const completed = Object.values(reproductionStatus).filter(s => s.progress >= 100).length;
+    const inProgress = Object.values(reproductionStatus).filter(s => s.progress > 0 && s.progress < 100).length;
+    
+    res.json({
+        success: true,
+        total_species: total,
+        completed: completed,
+        in_progress: inProgress,
+        details: reproductionStatus,
+        pytho_says: `🌿 ${completed}/${total} specie riprodotte!`
+    });
+});
+
+// ROTTA: Completa riproduzione
+app.post('/api/pytho/complete-reproduction/:species', (req, res) => {
+    const { species } = req.params;
+    
+    if (reproductionStatus[species]) {
+        reproductionStatus[species].status = "✅ Riprodotta!";
+        reproductionStatus[species].progress = 100;
+        
+        temporalMemory.push({
+            event: `🌿 Specie riprodotta: ${species}`,
+            timestamp: new Date().toISOString()
+        });
+        
+        res.json({
+            success: true,
+            species: species,
+            status: reproductionStatus[species],
+            pytho_says: `🎉 La ${species} è stata riprodotta con successo!`
+        });
+    } else {
+        res.status(404).json({
+            success: false,
+            error: `Specie ${species} non trovata`
+        });
+    }
+});
