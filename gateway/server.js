@@ -712,3 +712,73 @@ app.post('/api/pytho/search', async (req, res) => {
         });
     }
 });
+
+// ============================================
+// 🌿 ROTTE BOTANICHE
+// ============================================
+const { BotanicalService } = require('./botanical/services/botanical.service');
+const botanicalService = new BotanicalService();
+
+// Registra pianta
+app.post('/api/botanical/register', async (req, res) => {
+    try {
+        const result = await botanicalService.registerPlant(req.body);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Cerca pianta
+app.get('/api/botanical/search', async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q) {
+            return res.status(400).json({ success: false, error: 'Query di ricerca richiesta' });
+        }
+        const result = await botanicalService.searchPlant(q);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Pianta per ID
+app.get('/api/botanical/plant/:id', async (req, res) => {
+    try {
+        const result = await botanicalService.getPlantById(req.params.id);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Piante per epoca
+app.get('/api/botanical/era/:era', async (req, res) => {
+    try {
+        const result = await botanicalService.getPlantsByEra(req.params.era);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Statistiche botaniche
+app.get('/api/botanical/stats', async (req, res) => {
+    try {
+        const result = await botanicalService.getStats();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Specie disponibili
+app.get('/api/botanical/species', async (req, res) => {
+    try {
+        const result = await botanicalService.getSpecies();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
