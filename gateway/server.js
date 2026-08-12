@@ -102,34 +102,39 @@ app.get('/api/pytho/flux', (req, res) => {
 });
 
 // ============================================
-// CHAT DI PYTHO - RISPOSTE SEMPLICI
+// CHAT DI PYTHO
 // ============================================
 
-// Risposte predefinite
 const pythoResponses = {
     'daniel': [
         '👨‍🌾 Daniel Ioni è il creatore di MyZubster e Pytho! Un visionario che unisce blockchain e natura.',
-        '🌟 Daniel ha fondato MyZubster per creare un ecosistema sostenibile dove orti botanici e tecnologia si incontrano.'
+        '🌟 Daniel ha fondato MyZubster per creare un ecosistema sostenibile dove orti botanici e tecnologia si incontrano.',
+        '💚 Daniel crede che la tecnologia possa rendere il mondo più verde e decentralizzato.'
     ],
     'chiesa': [
         '⛪ La chiesa è un punto di riferimento spirituale e comunitario per molti paesi.',
-        '🌿 In molte comunità, la chiesa gestisce orti e giardini per sostenere i bisognosi.'
+        '🌿 In molte comunità, la chiesa gestisce orti e giardini per sostenere i bisognosi.',
+        '🌸 Gli orti della chiesa sono spesso luoghi di pace e riflessione.'
     ],
     'myz': [
         '🪙 MYZ è il token nativo dell\'ecosistema MyZubster, basato su blockchain.',
-        '🌿 MYZ serve per incentivare la cura degli orti botanici e la sostenibilità.'
+        '🌿 MYZ serve per incentivare la cura degli orti botanici e la sostenibilità.',
+        '💰 Con MYZ puoi pagare servizi, acquistare piante e partecipare alla governance.'
     ],
     'monero': [
         '🔶 Monero (XMR) è una criptovaluta focalizzata sulla privacy e l\'anonimato.',
-        '🔒 Le transazioni in Monero sono private e non tracciabili.'
+        '🔒 Le transazioni in Monero sono private e non tracciabili.',
+        '🌿 MyZubster accetta pagamenti in Monero per transazioni sicure e private.'
     ],
     'fluffypony': [
         '🐴 Fluffypony è il soprannome di Riccardo Spagni, uno dei fondatori di Monero.',
-        '🇮🇹 Riccardo Spagni è italiano e ha portato Monero alla ribalta internazionale.'
+        '🇮🇹 Riccardo Spagni è italiano e ha portato Monero alla ribalta internazionale.',
+        '🛡️ Grazie a Fluffypony, Monero ha mantenuto la sua rotta verso la privacy assoluta.'
     ],
     'musica': [
         '🎵 La musica è l\'anima del mondo vegetale! Le piante reagiscono positivamente alle vibrazioni sonore.',
-        '🌿 Gli studi dimostrano che la musica classica favorisce la crescita delle piante.'
+        '🌿 Gli studi dimostrano che la musica classica favorisce la crescita delle piante.',
+        '🎶 Pytho ama la musica! È il sottofondo perfetto per viaggiare nel tempo.'
     ],
     'default': [
         '👽 Non ho capito. Prova a chiedermi di: Daniel, MYZ, Monero, Fluffypony, chiesa, musica, orto, piante, acqua, concime, malattie, compost, clima, potatura o semina!',
@@ -141,7 +146,7 @@ function getPythoResponse(message) {
     const lower = message.toLowerCase();
     let response = 'default';
     
-    if (lower.includes('daniel') || lower.includes('ioni')) {
+    if (lower.includes('daniel') || lower.includes('ioni') || lower.includes('creatore')) {
         response = 'daniel';
     } else if (lower.includes('chiesa') || lower.includes('parrocchia')) {
         response = 'chiesa';
@@ -149,7 +154,7 @@ function getPythoResponse(message) {
         response = 'myz';
     } else if (lower.includes('monero') || lower.includes('xmr')) {
         response = 'monero';
-    } else if (lower.includes('fluffypony') || lower.includes('riccardo')) {
+    } else if (lower.includes('fluffypony') || lower.includes('riccardo') || lower.includes('spagni')) {
         response = 'fluffypony';
     } else if (lower.includes('musica') || lower.includes('canzone')) {
         response = 'musica';
@@ -192,7 +197,7 @@ app.post('/api/pytho/chat', (req, res) => {
     const response = getPythoResponse(message);
     
     temporalMemory.push({
-        event: `🗣️ Chat: "${message}"`,
+        event: `🗣️ Chat: "${message}" → "${response.substring(0, 50)}..."`,
         timestamp: new Date().toISOString()
     });
     
@@ -206,16 +211,22 @@ app.post('/api/pytho/chat', (req, res) => {
 });
 
 // ============================================
-// ROTTE PAGAMENTI
+// ROTTE PAGAMENTI MYZ
 // ============================================
 
 app.post('/api/myz/payment/create', (req, res) => {
     const { tag_id, amount } = req.body;
+    
     if (!tag_id || !amount) {
-        return res.status(400).json({ success: false, error: 'tag_id e amount sono obbligatori' });
+        return res.status(400).json({
+            success: false,
+            error: 'tag_id e amount sono obbligatori'
+        });
     }
+    
     const fee = (parseFloat(amount) * PLATFORM_FEE) / 100;
     const netAmount = parseFloat(amount) - fee;
+    
     const payment = {
         id: 'myz_' + Date.now() + Math.random().toString(36).substr(2, 5),
         tag_id,
@@ -225,35 +236,20 @@ app.post('/api/myz/payment/create', (req, res) => {
         fee: fee,
         net_amount: netAmount,
         status: 'pending',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        synced_to_myz: false
     };
+    
     payments.push(payment);
     savePayments(payments);
     res.json({ success: true, ...payment });
-});
-
-app.get('/api/dashboard', (req, res) => {
-    const total = payments.reduce((s, p) => s + (p.net_amount || p.amount), 0);
-    res.json({
-        success: true,
-        dashboard: {
-            total_payments: payments.length,
-            pending: payments.filter(p => p.status === 'pending').length,
-            paid: payments.filter(p => p.status === 'paid').length,
-            total_myz: total,
-            wallet: { myz: MYZ_WALLET, xmr: XMR_WALLET }
-        }
-    });
-});
-
-app.get('/api/cardputer/payments', (req, res) => {
-    res.json({ success: true, count: payments.length, payments: payments });
 });
 
 app.get('/api/myz/stats', (req, res) => {
     const myzPayments = payments.filter(p => p.currency === 'MYZ');
     const totalMYZ = myzPayments.reduce((sum, p) => sum + (p.net_amount || p.amount), 0);
     const totalFee = myzPayments.reduce((sum, p) => sum + (p.fee || 0), 0);
+    
     res.json({
         success: true,
         stats: {
@@ -267,7 +263,156 @@ app.get('/api/myz/stats', (req, res) => {
     });
 });
 
-// Avvia il server
+app.post('/api/myz/sync', (req, res) => {
+    try {
+        const myzPayments = payments.filter(p => 
+            p.currency === 'MYZ' && 
+            p.status === 'paid' && 
+            !p.synced_to_myz
+        );
+        
+        if (myzPayments.length === 0) {
+            return res.json({
+                success: true,
+                message: 'Nessun pagamento MYZ da sincronizzare',
+                synced: 0
+            });
+        }
+        
+        let syncedCount = 0;
+        for (const payment of myzPayments) {
+            payment.synced_to_myz = true;
+            payment.synced_at = new Date().toISOString();
+            syncedCount++;
+        }
+        
+        savePayments(payments);
+        
+        res.json({
+            success: true,
+            message: syncedCount + ' pagamenti MYZ sincronizzati',
+            synced: syncedCount
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// ============================================
+// ROTTE PAGAMENTI XMR
+// ============================================
+
+app.post('/api/cardputer/payment/create', (req, res) => {
+    const { tag_id, amount } = req.body;
+    
+    if (!tag_id || !amount) {
+        return res.status(400).json({
+            success: false,
+            error: 'tag_id e amount sono obbligatori'
+        });
+    }
+    
+    const payment_id = 'pay_' + Date.now() + Math.random().toString(36).substr(2, 5);
+    const address = XMR_WALLET_ADDRESS;
+    
+    const payment = {
+        id: payment_id,
+        tag_id: tag_id,
+        amount: parseFloat(amount),
+        currency: 'XMR',
+        address: address,
+        status: 'pending',
+        created_at: new Date().toISOString()
+    };
+    
+    payments.push(payment);
+    savePayments(payments);
+    res.json({
+        success: true,
+        payment_id: payment_id,
+        address: address,
+        amount: parseFloat(amount),
+        tag: tag_id
+    });
+});
+
+app.get('/api/cardputer/payments', (req, res) => {
+    res.json({
+        success: true,
+        count: payments.length,
+        payments: payments
+    });
+});
+
+// ============================================
+// ROTTA: AGGIORNA STATO PAGAMENTO
+// ============================================
+
+app.put('/api/cardputer/payment/status/:payment_id', (req, res) => {
+    const { payment_id } = req.params;
+    const { status } = req.body;
+
+    if (!status || !['pending', 'paid', 'expired'].includes(status)) {
+        return res.status(400).json({
+            success: false,
+            error: 'Status non valido. Usa: pending, paid, expired'
+        });
+    }
+
+    const payment = payments.find(p => p.id === payment_id);
+    if (!payment) {
+        return res.status(404).json({
+            success: false,
+            error: 'Pagamento non trovato'
+        });
+    }
+
+    payment.status = status;
+    payment.updated_at = new Date().toISOString();
+    savePayments(payments);
+
+    res.json({
+        success: true,
+        payment: payment
+    });
+});
+
+// ============================================
+// DASHBOARD
+// ============================================
+
+app.get('/api/dashboard', (req, res) => {
+    const totalXMR = payments
+        .filter(p => p.currency === 'XMR' && p.status === 'paid')
+        .reduce((sum, p) => sum + p.amount, 0);
+    
+    const totalMYZ = payments
+        .filter(p => p.currency === 'MYZ' && p.status === 'paid')
+        .reduce((sum, p) => sum + (p.net_amount || p.amount), 0);
+    
+    res.json({
+        success: true,
+        dashboard: {
+            total_payments: payments.length,
+            pending: payments.filter(p => p.status === 'pending').length,
+            paid: payments.filter(p => p.status === 'paid').length,
+            total_xmr: totalXMR,
+            total_myz: totalMYZ,
+            wallet: {
+                myz: MYZ_WALLET,
+                xmr: XMR_WALLET
+            }
+        }
+    });
+});
+
+// ============================================
+// AVVIA SERVER
+// ============================================
+
 app.listen(port, () => {
     console.log('🚀 Pytho Temporal su porta ' + port);
     console.log('👽 Macchina del tempo attiva!');
