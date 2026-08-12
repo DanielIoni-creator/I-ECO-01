@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👽 Pytho Portal - MyZubster</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👽</text></svg>">
+</head>
+<body>
+    <div class="portal-container">
+        <!-- Header -->
+        <header class="portal-header">
+            <div class="logo">
+                <span class="alien-icon">👽</span>
+                <h1>PYTHO PORTAL</h1>
+                <span class="version">v3.2.0</span>
+            </div>
+            <div class="header-actions">
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span>Online</span>
+                </div>
+                <button class="btn-login" id="loginBtn" onclick="toggleLogin()">🔐 Accedi</button>
+            </div>
+        </header>
+
+        <!-- Login/Register Modal -->
+        <div id="authModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close" onclick="toggleLogin()">&times;</span>
+                <div id="authForm">
+                    <h2 id="authTitle">🔐 Accedi a MyZubster</h2>
+                    
+                    <!-- Login Form -->
+                    <form id="loginForm" class="auth-form">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="loginEmail" placeholder="email@esempio.it" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="loginPassword" placeholder="Inserisci password" required>
+                        </div>
+                        <button type="submit" class="btn-primary">🚀 Accedi</button>
+                        <p class="switch-auth">
+                            Non hai un account? <a href="#" onclick="switchAuth('register')">Registrati</a>
+                        </p>
+                    </form>
+
+                    <!-- Register Form -->
+                    <form id="registerForm" class="auth-form" style="display:none;">
+                        <div class="form-group">
+                            <label>Nome e Cognome</label>
+                            <input type="text" id="regName" placeholder="Mario Rossi" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="regEmail" placeholder="email@esempio.it" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="regPassword" placeholder="Minimo 6 caratteri" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Conferma Password</label>
+                            <input type="password" id="regPasswordConfirm" placeholder="Conferma password" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Comune</label>
+                            <select id="regComune" required>
+                                <option value="">Seleziona il tuo comune</option>
+                                <option value="Roma">Roma</option>
+                                <option value="Napoli">Napoli</option>
+                                <option value="Palermo">Palermo</option>
+                                <option value="Firenze">Firenze</option>
+                                <option value="Bologna">Bologna</option>
+                                <option value="Milano">Milano</option>
+                                <option value="Torino">Torino</option>
+                                <option value="Genova">Genova</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">🪙 Registrati</button>
+                        <p class="switch-auth">
+                            Hai già un account? <a href="#" onclick="switchAuth('login')">Accedi</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile (after login) -->
+        <div id="userProfile" style="display:none;" class="user-profile">
+            <div class="profile-header">
+                <span class="user-avatar">👤</span>
+                <div class="user-info">
+                    <span class="user-name" id="userName">Mario Rossi</span>
+                    <span class="user-email" id="userEmail">mario@esempio.it</span>
+                </div>
+                <button class="btn-logout" onclick="logout()">🚪 Esci</button>
+            </div>
+            <div class="user-wallets">
+                <div class="wallet-item">
+                    <span>🪙 MYZ Wallet</span>
+                    <span class="wallet-value" id="userMyzWallet">0.00 MYZ</span>
+                </div>
+                <div class="wallet-item">
+                    <span>🔶 XMR Wallet</span>
+                    <span class="wallet-value" id="userXmrWallet">0.00 XMR</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🤖</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="robotStatus">Online</span>
+                    <span class="stat-label">Robot Giardiniere</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🌱</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="sensorCount">0</span>
+                    <span class="stat-label">Sensori Attivi</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="totalPayments">0</span>
+                    <span class="stat-label">Pagamenti MYZ</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🌿</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="plantCount">24</span>
+                    <span class="stat-label">Specie Registrate</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Grid -->
+        <section class="main-grid">
+            <!-- Pytho Chat -->
+            <div class="panel chat-panel">
+                <div class="panel-header">
+                    <span>💬 Pytho Chat</span>
+                    <span class="panel-status">🟢 Live</span>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message pytho">
+                        <span class="avatar">👽</span>
+                        <div class="message-content">
+                            <strong>Pytho</strong>
+                            <p>Ciao! Sono Pytho, il tuo assistente intelligente. Registrati per accedere a tutte le funzionalità! 🌿</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Chiedi a Pytho...">
+                    <button id="chatSend">🚀</button>
+                </div>
+                <div class="quick-actions">
+                    <button onclick="askPytho('Stato degli orti')">🌿 Orti</button>
+                    <button onclick="askPytho('Pagamenti MYZ')">💰 Pagamenti</button>
+                    <button onclick="askPytho('Sensori IoT')">📡 Sensori</button>
+                    <button onclick="askPytho('Registrazione comune')">🏛️ Comune</button>
+                </div>
+            </div>
+
+            <!-- Sensor Dashboard -->
+            <div class="panel sensor-panel">
+                <div class="panel-header">
+                    <span>📡 Sensori IoT</span>
+                    <span class="panel-status">🟢 Live</span>
+                </div>
+                <div class="sensor-grid">
+                    <div class="sensor-item">
+                        <span class="sensor-icon">🌡️</span>
+                        <span class="sensor-label">Temperatura</span>
+                        <span class="sensor-value" id="tempValue">22.5°C</span>
+                    </div>
+                    <div class="sensor-item">
+                        <span class="sensor-icon">💧</span>
+                        <span class="sensor-label">Umidità</span>
+                        <span class="sensor-value" id="humidityValue">65%</span>
+                    </div>
+                    <div class="sensor-item">
+                        <span class="sensor-icon">🌱</span>
+                        <span class="sensor-label">Terreno</span>
+                        <span class="sensor-value" id="soilValue">45%</span>
+                    </div>
+                    <div class="sensor-item">
+                        <span class="sensor-icon">☀️</span>
+                        <span class="sensor-label">Luce</span>
+                        <span class="sensor-value" id="lightValue">800 lux</span>
+                    </div>
+                </div>
+                <div class="sensor-chart" id="sensorChart">
+                    <canvas id="chartCanvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="panel controls-panel">
+                <div class="panel-header">
+                    <span>🎮 Controlli</span>
+                    <span class="panel-status">🟢 Attivi</span>
+                </div>
+                <div class="controls-grid">
+                    <button class="control-btn" onclick="sendCommand('robot_start')">🤖 Avvia Robot</button>
+                    <button class="control-btn" onclick="sendCommand('robot_stop')">⏹️ Ferma Robot</button>
+                    <button class="control-btn" onclick="sendCommand('lights_on')">💡 Luci On</button>
+                    <button class="control-btn" onclick="sendCommand('lights_off')">💡 Luci Off</button>
+                    <button class="control-btn" onclick="sendCommand('mode_rainbow')">🌈 Rainbow</button>
+                    <button class="control-btn" onclick="sendCommand('mode_nature')">🌿 Natura</button>
+                    <button class="control-btn" onclick="sendCommand('mode_party')">🎉 Party</button>
+                    <button class="control-btn" onclick="sendCommand('mode_sleep')">😴 Sleep</button>
+                </div>
+            </div>
+
+            <!-- Payments & Registry -->
+            <div class="panel payments-panel">
+                <div class="panel-header">
+                    <span>💰 Pagamenti & Registrazioni</span>
+                    <span class="panel-status">🟢 Attivi</span>
+                </div>
+                <div class="payment-info">
+                    <div class="payment-item">
+                        <span>🏛️ Comune Registrato</span>
+                        <span class="payment-value" id="registeredComune">-</span>
+                    </div>
+                    <div class="payment-item">
+                        <span>🪙 MYZ Wallet</span>
+                        <span class="payment-value" id="myzBalance">0 MYZ</span>
+                    </div>
+                    <div class="payment-item">
+                        <span>🔶 XMR Wallet</span>
+                        <span class="payment-value" id="xmrBalance">0 XMR</span>
+                    </div>
+                    <div class="payment-item">
+                        <span>👥 Utenti Registrati</span>
+                        <span class="payment-value" id="userCount">0</span>
+                    </div>
+                </div>
+                <div class="registry-actions">
+                    <button class="btn-primary" onclick="createPayment()">🪙 Crea Pagamento</button>
+                    <button class="btn-secondary" onclick="registerComune()">🏛️ Registra Comune</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="portal-footer">
+            <span>👽 Pytho Portal - MyZubster Ecosystem</span>
+            <span>v3.2.0 • Open Source</span>
+        </footer>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
