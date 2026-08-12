@@ -1,0 +1,15 @@
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const cors = require('cors');
+const app = express();
+const port = 3001;
+
+app.use(cors());
+app.use(express.json());
+
+// ... (incolla qui TUTTO il codice del server.js, fino alla fine) ...
+// ... (assicurati che l'ultima riga sia "module.exports = app;") ...
+
+// Alla fine del file, invece di app.listen(), aggiungi:
+module.exports = app;

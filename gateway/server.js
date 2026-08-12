@@ -419,3 +419,259 @@ app.listen(port, () => {
     console.log('🛸 http://localhost:' + port + '/temporal');
     console.log('📊 http://localhost:' + port + '/api/dashboard');
 });
+
+// ============================================
+// 🌿 BOTANICAL PAST - Recupero Piante dal Passato
+// ============================================
+app.post('/api/pytho/botanical-past', async (req, res) => {
+    try {
+        const { location, year, species, register } = req.body;
+        
+        console.log('🌿 Botanical Past Request:', { location, year, species, register });
+        
+        // Carica o crea il database delle piante
+        const fs = require('fs');
+        const dbPath = './plants.json';
+        let plants = [];
+        
+        if (fs.existsSync(dbPath)) {
+            plants = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+        }
+        
+        // Aggiungi le nuove specie
+        const newSpecies = species.map(name => ({
+            id: `plant_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+            name: name,
+            location: location,
+            year: year,
+            registered: register || true,
+            timestamp: new Date().toISOString()
+        }));
+        
+        plants.push(...newSpecies);
+        
+        // Salva nel database
+        fs.writeFileSync(dbPath, JSON.stringify(plants, null, 2));
+        
+        res.json({
+            success: true,
+            message: `✅ ${species.length} specie registrate da ${location} (${year})`,
+            location: location,
+            year: year,
+            species: newSpecies,
+            total: plants.length,
+            timestamp: new Date().toISOString()
+        });
+        
+    } catch (error) {
+        console.error('❌ Errore botanical-past:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// ============================================
+// 📋 LISTA TUTTE LE SPECIE
+// ============================================
+app.get('/api/pytho/all-species', async (req, res) => {
+    try {
+        const fs = require('fs');
+        const dbPath = './plants.json';
+        
+        if (!fs.existsSync(dbPath)) {
+            return res.json([]);
+        }
+        
+        const plants = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+        res.json(plants);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============================================
+// 🔍 SPECIE PER ERA
+// ============================================
+app.get('/api/pytho/species-by-era', async (req, res) => {
+    try {
+        const { era } = req.query;
+        const fs = require('fs');
+        const dbPath = './plants.json';
+        
+        if (!fs.existsSync(dbPath)) {
+            return res.json([]);
+        }
+        
+        const plants = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+        const filtered = plants.filter(p => p.year == era);
+        res.json(filtered);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============================================
+// 📊 CONTA SPECIE
+// ============================================
+app.get('/api/pytho/species-count', async (req, res) => {
+    try {
+        const fs = require('fs');
+        const dbPath = './plants.json';
+        
+        if (!fs.existsSync(dbPath)) {
+            return res.json({ total: 0 });
+        }
+        
+        const plants = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+        res.json({ total: plants.length });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+// ============================================
+// 💰 ROUTE PAGAMENTI MANCANTI
+// ============================================
+
+// Lista pagamenti
+app.get('/api/myz/payments', async (req, res) => {
+    try {
+        const fs = require('fs');
+        const paymentsFile = './payments.json';
+        
+        if (!fs.existsSync(paymentsFile)) {
+            return res.json({ success: true, payments: [], total: 0 });
+        }
+        
+        const payments = JSON.parse(fs.readFileSync(paymentsFile, 'utf8'));
+        res.json({
+            success: true,
+            payments: payments,
+            total: payments.length
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Dettaglio wallet
+app.get('/api/myz/wallet', async (req, res) => {
+    try {
+        const wallet = {
+            myz: {
+                address: "myz_77d6ddd05bf30e8fef178ac1b5b5e112",
+                balance: 14876.4,
+                currency: "MYZ"
+            },
+            xmr: {
+                address: "xmr_641340aa6aa86029e833a5e5f5fb2b31",
+                balance: 0,
+                currency: "XMR"
+            },
+            lastUpdated: new Date().toISOString()
+        };
+        res.json({
+            success: true,
+            data: wallet
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Transazioni
+app.get('/api/myz/transactions', async (req, res) => {
+    try {
+        const fs = require('fs');
+        const paymentsFile = './payments.json';
+        
+        if (!fs.existsSync(paymentsFile)) {
+            return res.json({ success: true, transactions: [], total: 0 });
+        }
+        
+        const payments = JSON.parse(fs.readFileSync(paymentsFile, 'utf8'));
+        const transactions = payments.map(p => ({
+            id: p.id,
+            type: p.status === 'paid' ? 'credit' : 'pending',
+            amount: p.amount,
+            currency: p.currency || 'MYZ',
+            status: p.status,
+            description: `Pagamento da ${p.tag_id || 'utente'}`,
+            timestamp: p.created_at || p.createdAt || new Date().toISOString()
+        }));
+        
+        // Ordina per data (più recenti prima)
+        transactions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        res.json({
+            success: true,
+            transactions: transactions.slice(0, 20),
+            total: transactions.length
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Dettaglio pagamento singolo
+app.get('/api/myz/payment/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const fs = require('fs');
+        const paymentsFile = './payments.json';
+        
+        if (!fs.existsSync(paymentsFile)) {
+            return res.status(404).json({ success: false, error: 'Pagamento non trovato' });
+        }
+        
+        const payments = JSON.parse(fs.readFileSync(paymentsFile, 'utf8'));
+        const payment = payments.find(p => p.id === id);
+        
+        if (!payment) {
+            return res.status(404).json({ success: false, error: 'Pagamento non trovato' });
+        }
+        
+        res.json({
+            success: true,
+            data: payment
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Sincronizza pagamenti
+app.post('/api/myz/sync', async (req, res) => {
+    try {
+        const fs = require('fs');
+        const paymentsFile = './payments.json';
+        
+        if (!fs.existsSync(paymentsFile)) {
+            return res.json({ success: true, message: 'Nessun pagamento da sincronizzare', synced: 0 });
+        }
+        
+        const payments = JSON.parse(fs.readFileSync(paymentsFile, 'utf8'));
+        let synced = 0;
+        
+        payments.forEach(p => {
+            if (p.status === 'paid' && !p.synced_to_myz) {
+                p.synced_to_myz = true;
+                p.synced_at = new Date().toISOString();
+                synced++;
+            }
+        });
+        
+        fs.writeFileSync(paymentsFile, JSON.stringify(payments, null, 2));
+        
+        res.json({
+            success: true,
+            message: `${synced} pagamenti MYZ sincronizzati`,
+            synced: synced
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
