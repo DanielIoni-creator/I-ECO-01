@@ -1,0 +1,114 @@
+[
+  {
+    "id": "plant_1786501991183_b40i",
+    "name": "Salvia Officinalis - Salvia Antica",
+    "location": "Orto Botanico di Roma - Piante Medicinali",
+    "year": 1500,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:11.183Z"
+  },
+  {
+    "id": "plant_1786501991183_mp3v",
+    "name": "Rosmarinus Officinalis - Rosmarino Romano",
+    "location": "Orto Botanico di Roma - Piante Medicinali",
+    "year": 1500,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:11.183Z"
+  },
+  {
+    "id": "plant_1786501991183_h3qb",
+    "name": "Lavandula Angustifolia - Lavanda Medicinale",
+    "location": "Orto Botanico di Roma - Piante Medicinali",
+    "year": 1500,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:11.183Z"
+  },
+  {
+    "id": "plant_1786501991183_6ud2",
+    "name": "Mentha Piperita - Menta Romana",
+    "location": "Orto Botanico di Roma - Piante Medicinali",
+    "year": 1500,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:11.183Z"
+  },
+  {
+    "id": "plant_1786501991183_u0pd",
+    "name": "Thymus Vulgaris - Timo Antico",
+    "location": "Orto Botanico di Roma - Piante Medicinali",
+    "year": 1500,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:11.183Z"
+  },
+  {
+    "id": "plant_1786502003603_l9hc",
+    "name": "Rosa Gallica - Rosa Antica",
+    "location": "Orto Vittoriano - Piante Esotiche",
+    "year": 1800,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:23.603Z"
+  },
+  {
+    "id": "plant_1786502003603_a5yc",
+    "name": "Lilium Candidum - Giglio Bianco",
+    "location": "Orto Vittoriano - Piante Esotiche",
+    "year": 1800,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:23.603Z"
+  },
+  {
+    "id": "plant_1786502003603_xqv8",
+    "name": "Iris Germanica - Iris Tedesca",
+    "location": "Orto Vittoriano - Piante Esotiche",
+    "year": 1800,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:23.603Z"
+  },
+  {
+    "id": "plant_1786502003603_2inc",
+    "name": "Peonia Officinalis - Peonia Medicinale",
+    "location": "Orto Vittoriano - Piante Esotiche",
+    "year": 1800,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:23.603Z"
+  },
+  {
+    "id": "plant_1786502011578_z3f4",
+    "name": "Salvia Quantica - Salvia Quantica Curativa",
+    "location": "Giardino del Futuro - Piante Curative Evolute",
+    "year": 2124,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:31.578Z"
+  },
+  {
+    "id": "plant_1786502011578_p8rp",
+    "name": "Aloe Stellare - Aloe Stellare Curativa",
+    "location": "Giardino del Futuro - Piante Curative Evolute",
+    "year": 2124,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:31.578Z"
+  },
+  {
+    "id": "plant_1786502011578_vc6s",
+    "name": "Chamomilla Temporalis - Camomilla Temporale",
+    "location": "Giardino del Futuro - Piante Curative Evolute",
+    "year": 2124,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:31.578Z"
+  },
+  {
+    "id": "plant_1786502011578_90iu",
+    "name": "Rosmarinus Luminis - Rosmarino Luminoso",
+    "location": "Giardino del Futuro - Piante Curative Evolute",
+    "year": 2124,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:31.578Z"
+  },
+  {
+    "id": "plant_1786502011578_ukhb",
+    "name": "Lavandula Quantum - Lavanda Quantica",
+    "location": "Giardino del Futuro - Piante Curative Evolute",
+    "year": 2124,
+    "registered": true,
+    "timestamp": "2026-08-12T02:33:31.578Z"
+  }
+]
