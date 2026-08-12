@@ -675,3 +675,40 @@ app.post('/api/myz/sync', async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
+// ============================================
+// 🔍 ROTTA RICERCA ONLINE
+// ============================================
+const { SearchService } = require('./ai/search/search.service');
+const searchService = new SearchService();
+
+app.post('/api/pytho/search', async (req, res) => {
+    try {
+        const { query, type } = req.body;
+        
+        if (!query) {
+            return res.status(400).json({
+                success: false,
+                error: 'Query di ricerca richiesta'
+            });
+        }
+        
+        let results;
+        if (type === 'botanical') {
+            results = await searchService.searchBotanical(query);
+        } else {
+            results = await searchService.search(query);
+        }
+        
+        res.json({
+            success: true,
+            data: results
+        });
+    } catch (error) {
+        console.error('❌ Errore ricerca:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
