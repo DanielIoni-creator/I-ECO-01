@@ -82,14 +82,6 @@ const pythoResponses = {
         '👽 Ciao! Sono Pytho. Chiedimi di: MYZ, token, blockchain, ecosistema, pagamenti, pomodori, orto, piante, acqua, concime, malattie, compost, clima, potatura o semina!',
         '🌿 Pytho è un esperto di orti e di MyZubster. Cosa vuoi sapere?'
     ],
-    'default': [
-        '👽 Non ho capito. Prova a chiedermi di: MYZ, token, blockchain, ecosistema, pagamenti, pomodori, orto, piante, acqua, concime, malattie, compost, clima, potatura o semina!',
-        '🌿 Chiedimi qualcosa su MyZubster o sul tuo orto!'
-    ]
-};
-
-module.exports = { pythoResponses };
-
     'monero': [
         '🔶 Monero (XMR) è una criptovaluta focalizzata sulla privacy e l\'anonimato.',
         '🔒 Le transazioni in Monero sono private e non tracciabili, garantendo la riservatezza.',
@@ -116,8 +108,7 @@ module.exports = { pythoResponses };
         '⛏️ Monero utilizza il mining proof-of-work con algoritmo RandomX, ottimizzato per CPU.',
         '💻 Chiunque può minare Monero con un normale computer, rendendolo più decentralizzato.',
         '🌱 Il mining di Monero è accessibile a tutti, a differenza di Bitcoin che richiede hardware specializzato.'
-    ]
-
+    ],
     'chiesa': [
         '⛪ La chiesa è un punto di riferimento spirituale e comunitario per molti paesi.',
         '🌿 In molte comunità, la chiesa gestisce orti e giardini per sostenere i bisognosi.',
@@ -146,8 +137,7 @@ module.exports = { pythoResponses };
         '🌿 Gli orti comunitari promuovono la condivisione e la solidarietà.',
         '🍅 Coltivare insieme rafforza i legami tra le persone.',
         '🌱 Pytho supporta progetti che uniscono le comunità attraverso il giardinaggio.'
-    ]
-
+    ],
     'musica': [
         '🎵 La musica è l\'anima del mondo vegetale! Le piante reagiscono positivamente alle vibrazioni sonore.',
         '🌿 Gli studi dimostrano che la musica classica favorisce la crescita delle piante.',
@@ -176,8 +166,7 @@ module.exports = { pythoResponses };
         '🎵 Il vento tra le foglie, l\'acqua che scorre, gli uccelli che cantano: questa è la musica della natura.',
         '🌻 I suoni della natura sono una terapia per corpo e mente.',
         '🎶 Pytho invita a fermarsi e ascoltare la musica del giardino.'
-    ]
-
+    ],
     'storia_monero': [
         '📜 Monero è nato nel 2014 come fork di Bytecoin, con l\'obiettivo di creare una criptovaluta veramente privata.',
         '🔒 Il nome Monero significa "moneta" in esperanto, simbolo di universalità e privacy.',
@@ -211,4 +200,15 @@ module.exports = { pythoResponses };
         '🔐 Fluffypony ha sempre difeso la privacy di Monero contro ogni critica.',
         '🌿 MyZubster utilizza Monero per garantire che i contributi agli orti botanici restino privati.',
         '💚 La privacy è un diritto fondamentale, e Monero lo protegge.'
+    ],
+    'daniel': [
+        '👨‍🌾 Daniel Ioni è il creatore di MyZubster e Pytho! Un visionario che unisce blockchain e natura.',
+        '🌟 Daniel ha fondato MyZubster per creare un ecosistema sostenibile dove orti botanici e tecnologia si incontrano.'
+    ],
+    'default': [
+        '👽 Non ho capito. Prova a chiedermi di: Daniel, MYZ, Monero, Fluffypony, chiesa, musica, orto, piante, acqua, concime, malattie, compost, clima, potatura o semina!',
+        '🌿 Chiedimi qualcosa su MyZubster o sul tuo orto!'
     ]
+};
+
+module.exports = { pythoResponses };
