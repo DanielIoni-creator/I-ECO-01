@@ -25,21 +25,18 @@ class PythoRobot:
         self.thread = None
         
     def start(self):
-        """Avvia il robot"""
         self.is_running = True
         self.thread = threading.Thread(target=self._run)
         self.thread.start()
         print("🤖 Pytho Robot avviato!")
         
     def stop(self):
-        """Ferma il robot"""
         self.is_running = False
         if self.thread:
             self.thread.join()
         print("🤖 Pytho Robot fermato")
         
     def _run(self):
-        """Loop principale del robot"""
         while self.is_running:
             try:
                 self._read_sensors()
@@ -50,23 +47,16 @@ class PythoRobot:
                 print(f"Errore: {e}")
                 
     def _read_sensors(self):
-        """Legge i dati dai sensori"""
-        # Simulazione lettura sensori
         self.sensors.temperature = 22.5
         self.sensors.humidity = 65
         self.sensors.soil_moisture = 45.2
         self.sensors.light = 800
         self.sensors.distance = 50
-        print(f"📊 Sensori: {self.sensors}")
         
     def _navigate(self):
-        """Gestisce la navigazione"""
-        # Logica di navigazione
         print("🚗 Navigazione in corso...")
         
     def _process_data(self):
-        """Processa i dati raccolti"""
-        # Elaborazione dati
         data = {
             "sensors": {
                 "temperature": self.sensors.temperature,
@@ -81,17 +71,10 @@ class PythoRobot:
         return data
 
 if __name__ == "__main__":
-    # Configurazione
-    config = {
-        "name": "Pytho",
-        "speed": 0.5,
-        "max_distance": 100
-    }
-    
-    # Avvia robot
+    config = {"name": "Pytho", "speed": 0.5, "max_distance": 100}
     robot = PythoRobot(config)
     try:
         robot.start()
-        time.sleep(10)  # Esegue per 10 secondi
+        time.sleep(10)
     except KeyboardInterrupt:
         robot.stop()
