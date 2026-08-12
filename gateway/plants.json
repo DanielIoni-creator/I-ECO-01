@@ -110,5 +110,117 @@
     "year": 2124,
     "registered": true,
     "timestamp": "2026-08-12T02:33:31.578Z"
+  },
+  {
+    "id": "plant_1786512682239_jqj9",
+    "name": "Rosa Gallica - Rosa Antica",
+    "location": "Orto Vittoriano - Piante Esotiche",
+    "year": 1800,
+    "registered": true,
+    "timestamp": "2026-08-12T05:31:22.239Z"
+  },
+  {
+    "id": "plant_1786512682239_yb4s",
+    "name": "Lilium Candidum - Giglio Bianco",
+    "location": "Orto Vittoriano - Piante Esotiche",
+    "year": 1800,
+    "registered": true,
+    "timestamp": "2026-08-12T05:31:22.239Z"
+  },
+  {
+    "id": "plant_1786512682239_lo47",
+    "name": "Iris Germanica - Iris Tedesca",
+    "location": "Orto Vittoriano - Piante Esotiche",
+    "year": 1800,
+    "registered": true,
+    "timestamp": "2026-08-12T05:31:22.239Z"
+  },
+  {
+    "id": "plant_1786512682239_v4kc",
+    "name": "Peonia Officinalis - Peonia Medicinale",
+    "location": "Orto Vittoriano - Piante Esotiche",
+    "year": 1800,
+    "registered": true,
+    "timestamp": "2026-08-12T05:31:22.239Z"
+  },
+  {
+    "id": "plant_1786512682239_iuo4",
+    "name": "Lavandula Angustifolia - Lavanda Vittoriana",
+    "location": "Orto Vittoriano - Piante Esotiche",
+    "year": 1800,
+    "registered": true,
+    "timestamp": "2026-08-12T05:31:22.239Z"
+  },
+  {
+    "id": "plant_1786512682239_sr8b",
+    "name": "Rosmarinus Officinalis - Rosmarino Inglese",
+    "location": "Orto Vittoriano - Piante Esotiche",
+    "year": 1800,
+    "registered": true,
+    "timestamp": "2026-08-12T05:31:22.239Z"
+  },
+  {
+    "id": "plant_1786512682239_38dp",
+    "name": "Thymus Vulgaris - Timo Vittoriano",
+    "location": "Orto Vittoriano - Piante Esotiche",
+    "year": 1800,
+    "registered": true,
+    "timestamp": "2026-08-12T05:31:22.239Z"
+  },
+  {
+    "id": "plant_1786512682239_olm9",
+    "name": "Mentha Piperita - Menta Inglese",
+    "location": "Orto Vittoriano - Piante Esotiche",
+    "year": 1800,
+    "registered": true,
+    "timestamp": "2026-08-12T05:31:22.239Z"
+  },
+  {
+    "id": "plant_1786512852861_okfr",
+    "name": "Papiro (Cyperus papyrus) - La pianta della scrittura",
+    "location": "Giardini del Nilo - Piante Sacre",
+    "year": -3000,
+    "registered": true,
+    "timestamp": "2026-08-12T05:34:12.861Z"
+  },
+  {
+    "id": "plant_1786512852861_0b8e",
+    "name": "Loto (Nymphaea lotus) - Il fiore sacro del Nilo",
+    "location": "Giardini del Nilo - Piante Sacre",
+    "year": -3000,
+    "registered": true,
+    "timestamp": "2026-08-12T05:34:12.861Z"
+  },
+  {
+    "id": "plant_1786512852861_6i75",
+    "name": "Miele (Melissa officinalis) - La pianta dell'armonia",
+    "location": "Giardini del Nilo - Piante Sacre",
+    "year": -3000,
+    "registered": true,
+    "timestamp": "2026-08-12T05:34:12.861Z"
+  },
+  {
+    "id": "plant_1786512852861_jtzc",
+    "name": "Mirtillo (Myrtus communis) - La pianta dell'amore",
+    "location": "Giardini del Nilo - Piante Sacre",
+    "year": -3000,
+    "registered": true,
+    "timestamp": "2026-08-12T05:34:12.861Z"
+  },
+  {
+    "id": "plant_1786512852861_uojw",
+    "name": "Incenso (Boswellia) - La resina sacra",
+    "location": "Giardini del Nilo - Piante Sacre",
+    "year": -3000,
+    "registered": true,
+    "timestamp": "2026-08-12T05:34:12.861Z"
+  },
+  {
+    "id": "plant_1786512852861_pfjl",
+    "name": "Mirra (Commiphora) - Il balsamo degli dei",
+    "location": "Giardini del Nilo - Piante Sacre",
+    "year": -3000,
+    "registered": true,
+    "timestamp": "2026-08-12T05:34:12.861Z"
   }
 ]

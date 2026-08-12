@@ -1,0 +1,36 @@
+[
+  {
+    "id": "user_1786534515831_88a4659e",
+    "email": "francesco@parrocchia.it",
+    "password": "$2b$10$RpscXJNxvpLSex9KFjfsROjBmXj9pHwJy1Qm/9Wpe87ZjKx.ZviBS",
+    "nome": "Francesco",
+    "cognome": "Bernardone",
+    "ruolo": "botanist",
+    "telefono": "",
+    "citta": "",
+    "parrocchia": "",
+    "wallet": {
+      "myz": {
+        "address": "myz_0b15f9b968762225295cdbe6c14d8851d3255cff",
+        "balance": 100,
+        "currency": "MYZ"
+      },
+      "xmr": {
+        "address": "xmr_9721240afb549f46da2bb328584dd41b19973b46",
+        "balance": 0,
+        "currency": "XMR"
+      }
+    },
+    "stats": {
+      "piante_registrate": 0,
+      "myz_guadagnati": 100,
+      "orti_creati": 0,
+      "transazioni": 1
+    },
+    "createdAt": "2026-08-12T11:35:15.831Z",
+    "updatedAt": "2026-08-12T11:36:05.142Z",
+    "lastLogin": "2026-08-12T11:35:48.166Z",
+    "attivo": true,
+    "email_verificato": false
+  }
+]

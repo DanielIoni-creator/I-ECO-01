@@ -24,6 +24,7 @@ if (!fs.existsSync(PLANTS_DB)) {
 // ============================================
 const MINERALS_DB = path.join(__dirname, 'minerals/minerals.json');
 
+// Assicurati che la directory minerals esista
 if (!fs.existsSync(path.join(__dirname, 'minerals'))) {
     fs.mkdirSync(path.join(__dirname, 'minerals'));
 }
@@ -32,17 +33,12 @@ if (!fs.existsSync(MINERALS_DB)) {
 }
 
 // ============================================
-// 📝 SISTEMA REGISTRAZIONE UTENTI
-// ============================================
-const { UserDatabase } = require('./auth/register');
-const userDB = new UserDatabase();
-
-// ============================================
 // 🌿 BOTANICAL PAST - Piante
 // ============================================
 app.post('/api/pytho/botanical-past', async (req, res) => {
     try {
         const { location, year, species, register } = req.body;
+        
         console.log('🌿 Botanical Past:', { location, year, species: species?.length, register });
         
         if (!species || !Array.isArray(species) || species.length === 0) {
@@ -78,9 +74,13 @@ app.post('/api/pytho/botanical-past', async (req, res) => {
             total: plants.length,
             timestamp: new Date().toISOString()
         });
+        
     } catch (error) {
         console.error('❌ Errore botanical-past:', error);
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
     }
 });
 
@@ -108,13 +108,18 @@ function saveMinerals(minerals) {
     }
 }
 
+// Registra minerali
 app.post('/api/minerals/register', async (req, res) => {
     try {
         const { location, year, minerals: mineralList } = req.body;
+        
         console.log('🪨 Registrazione minerali:', { location, year, count: mineralList?.length });
         
         if (!mineralList || !Array.isArray(mineralList)) {
-            return res.status(400).json({ success: false, error: 'Lista minerali richiesta' });
+            return res.status(400).json({
+                success: false,
+                error: 'Lista minerali richiesta'
+            });
         }
 
         const existing = loadMinerals();
@@ -145,31 +150,44 @@ app.post('/api/minerals/register', async (req, res) => {
         });
     } catch (error) {
         console.error('❌ Errore registrazione minerali:', error);
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
     }
 });
 
+// Ottieni tutti i minerali
 app.get('/api/minerals/all', async (req, res) => {
     try {
         const minerals = loadMinerals();
-        res.json({ success: true, data: minerals, total: minerals.length });
+        res.json({
+            success: true,
+            data: minerals,
+            total: minerals.length
+        });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
+// Minerali per epoca
 app.get('/api/minerals/era/:era', async (req, res) => {
     try {
         const minerals = loadMinerals();
         const filtered = minerals.filter(m => m.year == req.params.era);
-        res.json({ success: true, data: filtered, total: filtered.length });
+        res.json({
+            success: true,
+            data: filtered,
+            total: filtered.length
+        });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
 // ============================================
-// 📋 LISTA PIANTE
+// 📋 LISTA TUTTE LE SPECIE (Piante)
 // ============================================
 app.get('/api/pytho/all-species', async (req, res) => {
     try {
@@ -183,6 +201,7 @@ app.get('/api/pytho/all-species', async (req, res) => {
     }
 });
 
+// Piante per epoca
 app.get('/api/pytho/species-by-era', async (req, res) => {
     try {
         const { era } = req.query;
@@ -200,6 +219,7 @@ app.get('/api/pytho/species-by-era', async (req, res) => {
     }
 });
 
+// Conta specie
 app.get('/api/pytho/species-count', async (req, res) => {
     try {
         if (!fs.existsSync(PLANTS_DB)) {
@@ -248,86 +268,6 @@ app.get('/api/myz/stats', async (req, res) => {
 });
 
 // ============================================
-// 🙏 ORTI FRANCESCANI
-// ============================================
-const ortiFrancescaniRoutes = require('./orti-francescani/routes/orto.routes.js');
-app.use('/api/orti-francescani', ortiFrancescaniRoutes);
-
-// ============================================
-// 📝 ROTTE REGISTRAZIONE
-// ============================================
-app.post('/api/auth/register', async (req, res) => {
-    try {
-        const result = await userDB.register(req.body);
-        if (result.success) {
-            res.status(201).json(result);
-        } else {
-            res.status(400).json(result);
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-app.post('/api/auth/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const result = await userDB.login(email, password);
-        if (result.success) {
-            res.json(result);
-        } else {
-            res.status(401).json(result);
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-app.get('/api/auth/profile/:id', async (req, res) => {
-    try {
-        const user = userDB.getUserById(req.params.id);
-        if (!user) {
-            return res.status(404).json({ success: false, error: 'Utente non trovato' });
-        }
-        res.json({
-            success: true,
-            user: {
-                id: user.id,
-                email: user.email,
-                nome: user.nome,
-                cognome: user.cognome,
-                ruolo: user.ruolo,
-                wallet: user.wallet,
-                stats: user.stats
-            }
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-app.get('/api/auth/stats', async (req, res) => {
-    try {
-        const stats = userDB.getStats();
-        res.json({ success: true, stats });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-app.get('/api/auth/wallet/:id', async (req, res) => {
-    try {
-        const wallet = userDB.getWallet(req.params.id);
-        if (!wallet) {
-            return res.status(404).json({ success: false, error: 'Wallet non trovato' });
-        }
-        res.json({ success: true, wallet });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// ============================================
 // 📊 DASHBOARD
 // ============================================
 app.get('/api/dashboard', async (req, res) => {
@@ -364,71 +304,12 @@ app.listen(port, () => {
     console.log(`🛸 http://localhost:${port}/temporal`);
     console.log(`📊 http://localhost:${port}/api/dashboard`);
     console.log(`🪨 Minerali: http://localhost:${port}/api/minerals/all`);
-    console.log(`🙏 Orti Francescani: http://localhost:${port}/api/orti-francescani`);
 });
 
 // ============================================
-// 👛 ROTTE WALLET
+// 🙏 ROTTE ORTI FRANCESCANI
 // ============================================
+const ortiFrancescaniRoutes = require('./orti-francescani/routes/orto.routes');
+app.use('/api/orti-francescani', ortiFrancescaniRoutes);
 
-// Aggiungi MYZ al wallet
-app.post('/api/auth/wallet/myz/add', async (req, res) => {
-    try {
-        const { userId, amount } = req.body;
-        if (!userId || !amount) {
-            return res.status(400).json({
-                success: false,
-                error: 'userId e amount sono richiesti'
-            });
-        }
-        const user = userDB.addMYZ(userId, amount);
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                error: 'Utente non trovato'
-            });
-        }
-        res.json({
-            success: true,
-            message: `✅ ${amount} MYZ aggiunti al wallet`,
-            wallet: user.wallet
-        });
-    } catch (error) {
-        console.error('❌ Errore aggiunta MYZ:', error);
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// Aggiungi XMR al wallet
-app.post('/api/auth/wallet/xmr/add', async (req, res) => {
-    try {
-        const { userId, amount } = req.body;
-        if (!userId || !amount) {
-            return res.status(400).json({
-                success: false,
-                error: 'userId e amount sono richiesti'
-            });
-        }
-        const user = userDB.addXMR(userId, amount);
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                error: 'Utente non trovato'
-            });
-        }
-        res.json({
-            success: true,
-            message: `✅ ${amount} XMR aggiunti al wallet`,
-            wallet: user.wallet
-        });
-    } catch (error) {
-        console.error('❌ Errore aggiunta XMR:', error);
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
+console.log('🙏 Orti Francescani API attiva!');
