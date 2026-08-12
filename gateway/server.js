@@ -101,13 +101,96 @@ app.get('/api/pytho/flux', (req, res) => {
     });
 });
 
-app.post('/api/pytho/chat', (req, res) => {
-    const { message } = req.body;
-    if (!message) {
-        return res.status(400).json({ success: false, error: 'Pytho ha bisogno di un messaggio per risponderti!' });
+// ============================================
+// CHAT DI PYTHO - RISPOSTE SEMPLICI
+// ============================================
+
+// Risposte predefinite
+const pythoResponses = {
+    'daniel': [
+        '👨‍🌾 Daniel Ioni è il creatore di MyZubster e Pytho! Un visionario che unisce blockchain e natura.',
+        '🌟 Daniel ha fondato MyZubster per creare un ecosistema sostenibile dove orti botanici e tecnologia si incontrano.'
+    ],
+    'chiesa': [
+        '⛪ La chiesa è un punto di riferimento spirituale e comunitario per molti paesi.',
+        '🌿 In molte comunità, la chiesa gestisce orti e giardini per sostenere i bisognosi.'
+    ],
+    'myz': [
+        '🪙 MYZ è il token nativo dell\'ecosistema MyZubster, basato su blockchain.',
+        '🌿 MYZ serve per incentivare la cura degli orti botanici e la sostenibilità.'
+    ],
+    'monero': [
+        '🔶 Monero (XMR) è una criptovaluta focalizzata sulla privacy e l\'anonimato.',
+        '🔒 Le transazioni in Monero sono private e non tracciabili.'
+    ],
+    'fluffypony': [
+        '🐴 Fluffypony è il soprannome di Riccardo Spagni, uno dei fondatori di Monero.',
+        '🇮🇹 Riccardo Spagni è italiano e ha portato Monero alla ribalta internazionale.'
+    ],
+    'musica': [
+        '🎵 La musica è l\'anima del mondo vegetale! Le piante reagiscono positivamente alle vibrazioni sonore.',
+        '🌿 Gli studi dimostrano che la musica classica favorisce la crescita delle piante.'
+    ],
+    'default': [
+        '👽 Non ho capito. Prova a chiedermi di: Daniel, MYZ, Monero, Fluffypony, chiesa, musica, orto, piante, acqua, concime, malattie, compost, clima, potatura o semina!',
+        '🌿 Chiedimi qualcosa su MyZubster o sul tuo orto!'
+    ]
+};
+
+function getPythoResponse(message) {
+    const lower = message.toLowerCase();
+    let response = 'default';
+    
+    if (lower.includes('daniel') || lower.includes('ioni')) {
+        response = 'daniel';
+    } else if (lower.includes('chiesa') || lower.includes('parrocchia')) {
+        response = 'chiesa';
+    } else if (lower.includes('myz') || lower.includes('token')) {
+        response = 'myz';
+    } else if (lower.includes('monero') || lower.includes('xmr')) {
+        response = 'monero';
+    } else if (lower.includes('fluffypony') || lower.includes('riccardo')) {
+        response = 'fluffypony';
+    } else if (lower.includes('musica') || lower.includes('canzone')) {
+        response = 'musica';
+    } else if (lower.includes('help') || lower.includes('aiuto')) {
+        response = 'help';
+    } else if (lower.includes('orto') || lower.includes('giardino')) {
+        response = 'orto';
+    } else if (lower.includes('pianta') || lower.includes('fiore')) {
+        response = 'piante';
+    } else if (lower.includes('acqua') || lower.includes('innaffiare')) {
+        response = 'acqua';
+    } else if (lower.includes('concime') || lower.includes('fertilizzante')) {
+        response = 'concime';
+    } else if (lower.includes('malattia') || lower.includes('funghi')) {
+        response = 'malattie';
+    } else if (lower.includes('compost')) {
+        response = 'compost';
+    } else if (lower.includes('clima') || lower.includes('sole')) {
+        response = 'clima';
+    } else if (lower.includes('potatura') || lower.includes('taglia')) {
+        response = 'potatura';
+    } else if (lower.includes('semina') || lower.includes('semi')) {
+        response = 'semina';
     }
     
-    const response = `👽 Ciao! Hai detto: "${message}". Pytho ti saluta! 🌿`;
+    const responses = pythoResponses[response] || pythoResponses['default'];
+    return responses[Math.floor(Math.random() * responses.length)];
+}
+
+app.post('/api/pytho/chat', (req, res) => {
+    const { message } = req.body;
+    
+    if (!message) {
+        return res.status(400).json({
+            success: false,
+            error: 'Pytho ha bisogno di un messaggio per risponderti!'
+        });
+    }
+    
+    const response = getPythoResponse(message);
+    
     temporalMemory.push({
         event: `🗣️ Chat: "${message}"`,
         timestamp: new Date().toISOString()
@@ -184,10 +267,7 @@ app.get('/api/myz/stats', (req, res) => {
     });
 });
 
-// ============================================
-// AVVIA SERVER
-// ============================================
-
+// Avvia il server
 app.listen(port, () => {
     console.log('🚀 Pytho Temporal su porta ' + port);
     console.log('👽 Macchina del tempo attiva!');
