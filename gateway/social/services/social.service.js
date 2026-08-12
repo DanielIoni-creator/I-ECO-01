@@ -1,5 +1,5 @@
 /**
- * 🌐 Social Service - Gestione Social Media
+ * 🌐 Social Service - Integrazione Social Media
  */
 
 class SocialService {
@@ -8,142 +8,191 @@ class SocialService {
             twitter: {
                 enabled: true,
                 name: 'Twitter/X',
-                icon: '🐦'
+                icon: '🐦',
+                connected: false
             },
             telegram: {
                 enabled: true,
                 name: 'Telegram',
-                icon: '💬'
+                icon: '💬',
+                connected: false
             },
             discord: {
                 enabled: true,
                 name: 'Discord',
-                icon: '🎮'
+                icon: '🎮',
+                connected: false
             },
             instagram: {
                 enabled: false,
                 name: 'Instagram',
-                icon: '📸'
+                icon: '📸',
+                connected: false
             }
         };
+        this.posts = [];
     }
 
-    // Condividi su Twitter
-    async shareOnTwitter(content) {
+    // Connetti piattaforma
+    async connectPlatform(platform, credentials) {
         try {
-            console.log('🐦 Condivisione su Twitter:', content);
-            // In produzione: integrare con Twitter API v2
+            if (!this.platforms[platform]) {
+                throw new Error('Piattaforma non supportata');
+            }
+            
+            // Simula connessione
+            this.platforms[platform].connected = true;
+            this.platforms[platform].credentials = credentials;
+            
             return {
                 success: true,
-                platform: 'twitter',
-                message: 'Tweet pubblicato con successo',
-                url: 'https://twitter.com/myzubster/status/123456789'
+                message: `✅ ${this.platforms[platform].name} connesso con successo!`,
+                platform: this.platforms[platform]
             };
         } catch (error) {
-            console.error('❌ Errore Twitter:', error);
+            console.error('❌ Errore connessione:', error);
             return { success: false, error: error.message };
         }
     }
 
-    // Invia su Telegram
-    async sendTelegramMessage(message) {
+    // Post su piattaforma
+    async post(platform, content) {
         try {
-            console.log('💬 Messaggio Telegram:', message);
-            // In produzione: integrare con Telegram Bot API
+            if (!this.platforms[platform] || !this.platforms[platform].connected) {
+                throw new Error(`Piattaforma ${platform} non connessa`);
+            }
+
+            const post = {
+                id: `post_${Date.now()}`,
+                platform: platform,
+                content: content,
+                timestamp: new Date().toISOString(),
+                status: 'published'
+            };
+
+            this.posts.push(post);
+
             return {
                 success: true,
-                platform: 'telegram',
-                message: 'Messaggio inviato con successo'
+                post: post,
+                message: `📤 Post pubblicato su ${this.platforms[platform].name}!`
             };
         } catch (error) {
-            console.error('❌ Errore Telegram:', error);
+            console.error('❌ Errore post:', error);
             return { success: false, error: error.message };
         }
     }
 
-    // Invia su Discord
-    async sendDiscordMessage(message) {
+    // Condividi pianta
+    async sharePlant(plantData) {
         try {
-            console.log('🎮 Messaggio Discord:', message);
-            // In produzione: integrare con Discord.js
+            const content = `🌿 Nuova pianta registrata: ${plantData.name} (${plantData.year}) - ${plantData.location}`;
+            
+            const results = [];
+            for (const [platform, data] of Object.entries(this.platforms)) {
+                if (data.enabled && data.connected) {
+                    const result = await this.post(platform, content);
+                    results.push(result);
+                }
+            }
+
             return {
                 success: true,
-                platform: 'discord',
-                message: 'Messaggio inviato con successo'
+                results: results,
+                message: '✅ Pianta condivisa sui social!'
             };
         } catch (error) {
-            console.error('❌ Errore Discord:', error);
+            console.error('❌ Errore sharePlant:', error);
             return { success: false, error: error.message };
         }
     }
 
-    // Condividi nuova pianta
-    async shareNewPlant(plantData) {
-        const message = `🌿 Nuova pianta registrata: ${plantData.name} (${plantData.year}) - ${plantData.location}`;
-        
-        const results = [];
-        
-        // Condividi su tutte le piattaforme abilitate
-        if (this.platforms.twitter.enabled) {
-            results.push(await this.shareOnTwitter(message));
-        }
-        if (this.platforms.telegram.enabled) {
-            results.push(await this.sendTelegramMessage(message));
-        }
-        if (this.platforms.discord.enabled) {
-            results.push(await this.sendDiscordMessage(message));
-        }
-        
-        return {
-            success: results.every(r => r.success),
-            results
-        };
-    }
+    // Condividi bounty
+    async shareBounty(bountyData) {
+        try {
+            const content = `🎯 Nuovo bounty: ${bountyData.title} - Ricompensa: ${bountyData.bountyAmount} ${bountyData.currency}`;
+            
+            const results = [];
+            for (const [platform, data] of Object.entries(this.platforms)) {
+                if (data.enabled && data.connected) {
+                    const result = await this.post(platform, content);
+                    results.push(result);
+                }
+            }
 
-    // Condividi nuovo bounty
-    async shareNewBounty(bountyData) {
-        const message = `🎯 Nuovo bounty: ${bountyData.title} - Ricompensa: ${bountyData.bountyAmount} ${bountyData.currency}`;
-        
-        const results = [];
-        
-        if (this.platforms.twitter.enabled) {
-            results.push(await this.shareOnTwitter(message));
+            return {
+                success: true,
+                results: results,
+                message: '✅ Bounty condiviso sui social!'
+            };
+        } catch (error) {
+            console.error('❌ Errore shareBounty:', error);
+            return { success: false, error: error.message };
         }
-        if (this.platforms.telegram.enabled) {
-            results.push(await this.sendTelegramMessage(message));
-        }
-        if (this.platforms.discord.enabled) {
-            results.push(await this.sendDiscordMessage(message));
-        }
-        
-        return {
-            success: results.every(r => r.success),
-            results
-        };
     }
 
     // Condividi pagamento
     async sharePayment(paymentData) {
-        const message = `💰 Nuovo pagamento: ${paymentData.amount} ${paymentData.currency} - ${paymentData.description || 'Transazione MyZubster'}`;
-        
-        const results = [];
-        
-        if (this.platforms.twitter.enabled) {
-            results.push(await this.shareOnTwitter(message));
+        try {
+            const content = `💰 Nuovo pagamento: ${paymentData.amount} ${paymentData.currency} - ${paymentData.description || 'Transazione MyZubster'}`;
+            
+            const results = [];
+            for (const [platform, data] of Object.entries(this.platforms)) {
+                if (data.enabled && data.connected) {
+                    const result = await this.post(platform, content);
+                    results.push(result);
+                }
+            }
+
+            return {
+                success: true,
+                results: results,
+                message: '✅ Pagamento condiviso sui social!'
+            };
+        } catch (error) {
+            console.error('❌ Errore sharePayment:', error);
+            return { success: false, error: error.message };
         }
-        if (this.platforms.telegram.enabled) {
-            results.push(await this.sendTelegramMessage(message));
-        }
-        
-        return {
-            success: results.every(r => r.success),
-            results
-        };
     }
 
-    // Ottieni stato piattaforme
-    getPlatformsStatus() {
-        return this.platforms;
+    // Ottieni status piattaforme
+    async getStatus() {
+        try {
+            const status = {};
+            for (const [platform, data] of Object.entries(this.platforms)) {
+                status[platform] = {
+                    name: data.name,
+                    icon: data.icon,
+                    enabled: data.enabled,
+                    connected: data.connected
+                };
+            }
+            return {
+                success: true,
+                status: status
+            };
+        } catch (error) {
+            console.error('❌ Errore getStatus:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // Ottieni posts
+    async getPosts(platform) {
+        try {
+            let posts = this.posts;
+            if (platform) {
+                posts = posts.filter(p => p.platform === platform);
+            }
+            return {
+                success: true,
+                posts: posts,
+                total: posts.length
+            };
+        } catch (error) {
+            console.error('❌ Errore getPosts:', error);
+            return { success: false, error: error.message };
+        }
     }
 }
 

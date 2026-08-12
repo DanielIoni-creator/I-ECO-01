@@ -782,3 +782,74 @@ app.get('/api/botanical/species', async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
+// ============================================
+// 🌐 ROTTE SOCIAL
+// ============================================
+const { SocialService } = require('./social/services/social.service');
+const socialService = new SocialService();
+
+// Connetti piattaforma
+app.post('/api/social/connect', async (req, res) => {
+    try {
+        const { platform, credentials } = req.body;
+        const result = await socialService.connectPlatform(platform, credentials);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Post su piattaforma
+app.post('/api/social/post', async (req, res) => {
+    try {
+        const { platform, content } = req.body;
+        const result = await socialService.post(platform, content);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Condividi pianta
+app.post('/api/social/share-plant', async (req, res) => {
+    try {
+        const { plantData } = req.body;
+        const result = await socialService.sharePlant(plantData);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Condividi bounty
+app.post('/api/social/share-bounty', async (req, res) => {
+    try {
+        const { bountyData } = req.body;
+        const result = await socialService.shareBounty(bountyData);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Status piattaforme
+app.get('/api/social/status', async (req, res) => {
+    try {
+        const result = await socialService.getStatus();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Posts
+app.get('/api/social/posts', async (req, res) => {
+    try {
+        const { platform } = req.query;
+        const result = await socialService.getPosts(platform);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
