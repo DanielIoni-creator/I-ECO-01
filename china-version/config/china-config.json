@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "name": "MyZubster China",
+  "description": "MyZubster per il mercato cinese",
+  "features": {
+    "crypto": {
+      "enabled": false,
+      "note": "Monero e MYZ non disponibili in Cina"
+    },
+    "payments": {
+      "wechat": true,
+      "alipay": true,
+      "bank_transfer": true
+    },
+    "hosting": {
+      "provider": "alibaba_cloud",
+      "region": "cn-hangzhou"
+    },
+    "language": "zh-CN",
+    "currency": "CNY"
+  }
+}

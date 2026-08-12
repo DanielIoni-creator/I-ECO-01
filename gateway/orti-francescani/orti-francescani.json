@@ -1,0 +1,60 @@
+[
+  {
+    "id": "orto_1786533703148_j3uv",
+    "nome": "Orto San Francesco - Rimini",
+    "parrocchia": "Parrocchia San Gaudenzo",
+    "indirizzo": "Via San Gaudenzo, 1",
+    "citta": "Rimini",
+    "coordinate": {
+      "lat": 0,
+      "lng": 0
+    },
+    "contatto": {
+      "nome": "",
+      "telefono": "",
+      "email": ""
+    },
+    "stato": "attivo",
+    "piante": [
+      {
+        "id": "plant_1786533755555_dof4",
+        "nome": "Pomodoro San Marzano",
+        "specie": "Solanum lycopersicum",
+        "tipologia": "ortaggio",
+        "volontarioId": "vol_francesco_001",
+        "note": "Prima pianta dell'orto francescano - Pianta benedetta! 🙏",
+        "registratoDa": "vol_francesco_001",
+        "timestamp": "2026-08-12T11:22:35.556Z"
+      },
+      {
+        "id": "plant_1786533781423_554n",
+        "nome": "Basilico",
+        "specie": "Ocimum basilicum",
+        "tipologia": "aromatica",
+        "volontarioId": "vol_francesco_002",
+        "note": "Basilico benedetto - per le paste del parroco! 🙏",
+        "registratoDa": "vol_francesco_002",
+        "timestamp": "2026-08-12T11:23:01.423Z"
+      },
+      {
+        "id": "plant_1786533781435_ml9o",
+        "nome": "Rosmarino",
+        "specie": "Rosmarinus officinalis",
+        "tipologia": "aromatica",
+        "volontarioId": "vol_francesco_003",
+        "note": "Rosmarino per la cucina del convento! 🌿",
+        "registratoDa": "vol_francesco_003",
+        "timestamp": "2026-08-12T11:23:01.435Z"
+      }
+    ],
+    "volontari": [],
+    "stats": {
+      "totale_piante": 3,
+      "totale_volontari": 0,
+      "totale_donazioni": 0,
+      "totale_myz_distribuiti": 0
+    },
+    "createdAt": "2026-08-12T11:21:43.148Z",
+    "updatedAt": "2026-08-12T11:23:01.435Z"
+  }
+]
