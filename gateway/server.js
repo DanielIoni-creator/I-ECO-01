@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 const app = express();
-const port = 3001;
+const port = 3004;
 
 app.use(cors());
 app.use(express.json());
@@ -251,3 +251,11 @@ app.listen(port, () => {
     console.log('🛸 http://localhost:' + port + '/temporal');
     console.log('📊 http://localhost:' + port + '/api/dashboard');
 });
+
+// ============================================
+// 📡 ROTTE NFC
+// ============================================
+const nfcRoutes = require('./nfc/nfc.routes');
+app.use('/api/nfc', nfcRoutes);
+
+console.log('📡 NFC API attiva!');
