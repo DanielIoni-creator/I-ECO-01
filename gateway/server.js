@@ -1,632 +1,253 @@
 const express = require('express');
-const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const cors = require('cors');
 const app = express();
 const port = 3001;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
 
-// ============================================
-// 📋 DATABASE PIANTE
-// ============================================
-const PLANTS_DB = path.join(__dirname, 'plants.json');
+// File di persistenza
+const DATA_FILE = path.join(__dirname, 'payments.json');
 
-if (!fs.existsSync(PLANTS_DB)) {
-    fs.writeFileSync(PLANTS_DB, JSON.stringify([]));
+// Configurazione wallet
+const MYZ_WALLET = 'myz_77d6ddd05bf30e8fef178ac1b5b5e112';
+const XMR_WALLET = 'xmr_641340aa6aa86029e833a5e5f5fb2b31';
+const PLATFORM_FEE = 2;
+
+// Carica pagamenti
+function loadPayments() {
+    try {
+        if (fs.existsSync(DATA_FILE)) {
+            return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+        }
+    } catch (e) {}
+    return [];
 }
 
-// ============================================
-// 🪨 DATABASE MINERALI
-// ============================================
-const MINERALS_DB = path.join(__dirname, 'minerals/minerals.json');
-
-if (!fs.existsSync(path.join(__dirname, 'minerals'))) {
-    fs.mkdirSync(path.join(__dirname, 'minerals'));
-}
-if (!fs.existsSync(MINERALS_DB)) {
-    fs.writeFileSync(MINERALS_DB, JSON.stringify([]));
+function savePayments(p) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(p, null, 2));
 }
 
-// ============================================
-// 📝 SISTEMA REGISTRAZIONE UTENTI
-// ============================================
-const { UserDatabase } = require('./auth/register');
-const userDB = new UserDatabase();
+let payments = loadPayments();
+
+// Memoria temporale di Pytho
+const temporalMemory = [];
+const timelineEvents = [
+    { event: '👽 Pytho creato', year: '2024', status: '✅' },
+    { event: '🌿 Primo orto botanico', year: '2024', status: '✅' },
+    { event: '🏛️ Comune di Firenze', year: '2024', status: '✅' },
+    { event: '🚀 Gateway live', year: '2024', status: '✅' },
+    { event: '🛸 Pytho viaggia nel tempo', year: '2124', status: '⏳' },
+    { event: '🌌 Pytho diventa leggenda', year: '3000', status: '🌀' }
+];
 
 // ============================================
-// 🌿 BOTANICAL PAST - Piante
+// ROTTE HTML
 // ============================================
-app.post('/api/pytho/botanical-past', async (req, res) => {
-    try {
-        const { location, year, species, register } = req.body;
-        console.log('🌿 Botanical Past:', { location, year, species: species?.length, register });
-        
-        if (!species || !Array.isArray(species) || species.length === 0) {
-            return res.status(400).json({
-                success: false,
-                error: 'Specificare almeno una specie'
-            });
-        }
-        
-        let plants = [];
-        if (fs.existsSync(PLANTS_DB)) {
-            plants = JSON.parse(fs.readFileSync(PLANTS_DB, 'utf8'));
-        }
-        
-        const newSpecies = species.map(name => ({
-            id: `plant_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
-            name: name.trim(),
-            location: location || 'Sconosciuto',
-            year: parseInt(year) || 0,
-            registered: register !== false,
-            timestamp: new Date().toISOString()
-        }));
-        
-        plants.push(...newSpecies);
-        fs.writeFileSync(PLANTS_DB, JSON.stringify(plants, null, 2));
-        
-        res.json({
-            success: true,
-            message: `✅ ${species.length} specie registrate da ${location} (${year})`,
-            location: location,
-            year: year,
-            species: newSpecies,
-            total: plants.length,
-            timestamp: new Date().toISOString()
-        });
-    } catch (error) {
-        console.error('❌ Errore botanical-past:', error);
-        res.status(500).json({ success: false, error: error.message });
-    }
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/temporal', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pytho-temporal.html'));
+});
+
+app.get('/chat', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pytho-chat.html'));
+});
+
+app.get('/mappa-globale', (req, res) => {
+    res.sendFile(path.join(__dirname, 'mappa-globale.html'));
 });
 
 // ============================================
-// 🪨 ROTTE MINERALI
+// ROTTE PYTHO TEMPORAL
 // ============================================
-function loadMinerals() {
-    try {
-        if (fs.existsSync(MINERALS_DB)) {
-            return JSON.parse(fs.readFileSync(MINERALS_DB, 'utf8'));
-        }
-        return [];
-    } catch (error) {
-        console.error('❌ Errore caricamento minerali:', error);
-        return [];
-    }
-}
 
-function saveMinerals(minerals) {
-    try {
-        fs.writeFileSync(MINERALS_DB, JSON.stringify(minerals, null, 2));
-        console.log('✅ Minerali salvati:', minerals.length);
-    } catch (error) {
-        console.error('❌ Errore salvataggio minerali:', error);
-    }
-}
-
-app.post('/api/minerals/register', async (req, res) => {
-    try {
-        const { location, year, minerals: mineralList } = req.body;
-        console.log('🪨 Registrazione minerali:', { location, year, count: mineralList?.length });
-        
-        if (!mineralList || !Array.isArray(mineralList)) {
-            return res.status(400).json({ success: false, error: 'Lista minerali richiesta' });
-        }
-
-        const existing = loadMinerals();
-        const newMinerals = mineralList.map(m => ({
-            id: `mineral_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-            name: m.name,
-            location: location,
-            year: year,
-            properties: m.properties || [],
-            symbol: m.symbol || 'N/A',
-            hardness: m.hardness || 0,
-            color: m.color || 'N/A',
-            uses: m.uses || [],
-            registered: true,
-            timestamp: new Date().toISOString()
-        }));
-
-        existing.push(...newMinerals);
-        saveMinerals(existing);
-
-        res.json({
-            success: true,
-            message: `✅ ${mineralList.length} minerali registrati da ${location} (${year})`,
-            location: location,
-            year: year,
-            minerals: newMinerals,
-            total: existing.length
-        });
-    } catch (error) {
-        console.error('❌ Errore registrazione minerali:', error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-app.get('/api/minerals/all', async (req, res) => {
-    try {
-        const minerals = loadMinerals();
-        res.json({ success: true, data: minerals, total: minerals.length });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-app.get('/api/minerals/era/:era', async (req, res) => {
-    try {
-        const minerals = loadMinerals();
-        const filtered = minerals.filter(m => m.year == req.params.era);
-        res.json({ success: true, data: filtered, total: filtered.length });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// ============================================
-// 📋 LISTA PIANTE
-// ============================================
-app.get('/api/pytho/all-species', async (req, res) => {
-    try {
-        if (!fs.existsSync(PLANTS_DB)) {
-            return res.json([]);
-        }
-        const plants = JSON.parse(fs.readFileSync(PLANTS_DB, 'utf8'));
-        res.json(plants);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.get('/api/pytho/species-by-era', async (req, res) => {
-    try {
-        const { era } = req.query;
-        if (!era) {
-            return res.status(400).json({ error: 'Specificare era (es: era=1500)' });
-        }
-        if (!fs.existsSync(PLANTS_DB)) {
-            return res.json([]);
-        }
-        const plants = JSON.parse(fs.readFileSync(PLANTS_DB, 'utf8'));
-        const filtered = plants.filter(p => p.year == era);
-        res.json(filtered);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.get('/api/pytho/species-count', async (req, res) => {
-    try {
-        if (!fs.existsSync(PLANTS_DB)) {
-            return res.json({ total: 0 });
-        }
-        const plants = JSON.parse(fs.readFileSync(PLANTS_DB, 'utf8'));
-        res.json({ total: plants.length });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============================================
-// 🛸 TIME TRAVEL
-// ============================================
-app.post('/api/pytho/timetravel', async (req, res) => {
+app.post('/api/pytho/timetravel', (req, res) => {
     const { destination, year } = req.body;
+    const result = {
+        timestamp: new Date().toISOString(),
+        destination: destination || 'Orto Botanico di Roma',
+        year: year || 2024,
+        status: '🛸 Viaggio completato!',
+        pytho: '👽 Il tempo è un concetto umano...',
+        flux: '1.21 GW ⚡'
+    };
+    temporalMemory.push({ event: `Viaggio al ${destination} (${year})`, timestamp: new Date().toISOString() });
+    res.json({ success: true, travel: result });
+});
+
+app.get('/api/pytho/timeline', (req, res) => {
     res.json({
         success: true,
-        travel: {
-            timestamp: new Date().toISOString(),
-            destination: destination || 'Sconosciuto',
-            year: year || 0,
-            status: '🛸 Viaggio completato!',
-            pytho: '👽 Il tempo è un concetto umano...',
-            flux: '1.21 GW ⚡'
+        timeline: timelineEvents,
+        temporal_memory: temporalMemory,
+        status: '🟢 Attivo'
+    });
+});
+
+app.get('/api/pytho/flux', (req, res) => {
+    res.json({
+        success: true,
+        flux: {
+            power: '1.21 GW',
+            charge: Math.floor(Math.random() * 100) + 1 + '%',
+            status: '🔋 Carico'
         }
     });
 });
 
 // ============================================
-// 💰 PAGAMENTI
+// CHAT DI PYTHO - INTEGRAZIONE AI & RISPOSTE RICCHE
 // ============================================
-app.get('/api/myz/stats', async (req, res) => {
+
+const { pythoResponses } = require('./pytho-responses.js');
+const { getPythoAIResponse } = require('./pytho-ai.js');
+
+function getPythoResponse(message) {
+    const lower = message.toLowerCase();
+    let key = 'default';
+    
+    // Mappatura chiavi per risposte predefinite
+    const keywords = {
+        'daniel': ['daniel', 'ioni'],
+        'chiesa': ['chiesa', 'parrocchia', 'fede', 'monastero', 'comunità'],
+        'myz': ['myz', 'token'],
+        'monero': ['monero', 'xmr', 'privacy', 'mining', 'storia_monero'],
+        'fluffypony': ['fluffypony', 'riccardo', 'spagni'],
+        'musica': ['musica', 'canzone', 'strumenti', 'canto', 'natura_musica'],
+        'pomodori': ['pomodori'],
+        'orto': ['orto', 'giardino'],
+        'piante': ['pianta', 'fiore'],
+        'acqua': ['acqua', 'innaffiare'],
+        'concime': ['concime', 'fertilizzante'],
+        'malattie': ['malattia', 'funghi', 'insetti'],
+        'compost': ['compost'],
+        'clima': ['clima', 'sole', 'gelo'],
+        'potatura': ['potatura', 'taglia'],
+        'semina': ['semina', 'semi'],
+        'help': ['help', 'aiuto']
+    };
+
+    for (const [k, words] of Object.entries(keywords)) {
+        if (words.some(w => lower.includes(w))) {
+            key = k;
+            break;
+        }
+    }
+    
+    const responses = pythoResponses[key] || pythoResponses['default'];
+    return responses[Math.floor(Math.random() * responses.length)];
+}
+
+app.post('/api/pytho/chat', async (req, res) => {
+    const { message, history } = req.body;
+    
+    if (!message) {
+        return res.status(400).json({
+            success: false,
+            error: 'Pytho ha bisogno di un messaggio per risponderti!'
+        });
+    }
+    
+    // Prova con l'AI (Ollama), altrimenti usa le risposte predefinite
+    let response;
+    try {
+        response = await getPythoAIResponse(message, history || []);
+    } catch (e) {
+        console.error('Errore AI, uso fallback:', e);
+        response = getPythoResponse(message);
+    }
+    
+    // Se l'AI restituisce null o vuoto, usa fallback
+    if (!response) {
+        response = getPythoResponse(message);
+    }
+    
+    temporalMemory.push({
+        event: `🗣️ Chat: "${message}"`,
+        timestamp: new Date().toISOString()
+    });
+    
+    res.json({
+        success: true,
+        message: message,
+        response: response,
+        pytho_says: response,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// ============================================
+// ROTTE PAGAMENTI
+// ============================================
+
+app.post('/api/myz/payment/create', (req, res) => {
+    const { tag_id, amount } = req.body;
+    if (!tag_id || !amount) {
+        return res.status(400).json({ success: false, error: 'tag_id e amount sono obbligatori' });
+    }
+    const fee = (parseFloat(amount) * PLATFORM_FEE) / 100;
+    const netAmount = parseFloat(amount) - fee;
+    const payment = {
+        id: 'myz_' + Date.now() + Math.random().toString(36).substr(2, 5),
+        tag_id,
+        amount: parseFloat(amount),
+        currency: 'MYZ',
+        address: MYZ_WALLET,
+        fee: fee,
+        net_amount: netAmount,
+        status: 'pending',
+        created_at: new Date().toISOString()
+    };
+    payments.push(payment);
+    savePayments(payments);
+    res.json({ success: true, ...payment });
+});
+
+app.get('/api/dashboard', (req, res) => {
+    const total = payments.reduce((s, p) => s + (p.net_amount || p.amount), 0);
+    res.json({
+        success: true,
+        dashboard: {
+            total_payments: payments.length,
+            pending: payments.filter(p => p.status === 'pending').length,
+            paid: payments.filter(p => p.status === 'paid').length,
+            total_myz: total,
+            wallet: { myz: MYZ_WALLET, xmr: XMR_WALLET }
+        }
+    });
+});
+
+app.get('/api/cardputer/payments', (req, res) => {
+    res.json({ success: true, count: payments.length, payments: payments });
+});
+
+app.get('/api/myz/stats', (req, res) => {
+    const myzPayments = payments.filter(p => p.currency === 'MYZ');
+    const totalMYZ = myzPayments.reduce((sum, p) => sum + (p.net_amount || p.amount), 0);
+    const totalFee = myzPayments.reduce((sum, p) => sum + (p.fee || 0), 0);
     res.json({
         success: true,
         stats: {
-            total_payments: 8,
-            total_amount: 14900.9,
-            total_fee: 303.6,
-            pending: 1,
-            paid: 7,
-            synced: 7
+            total_payments: myzPayments.length,
+            total_amount: totalMYZ,
+            total_fee: totalFee,
+            pending: myzPayments.filter(p => p.status === 'pending').length,
+            paid: myzPayments.filter(p => p.status === 'paid').length,
+            synced: myzPayments.filter(p => p.synced_to_myz).length
         }
     });
 });
 
-// ============================================
-// 🙏 ORTI FRANCESCANI
-// ============================================
-const ortiFrancescaniRoutes = require('./orti-francescani/routes/orto.routes.js');
-app.use('/api/orti-francescani', ortiFrancescaniRoutes);
-
-// ============================================
-// 📝 ROTTE REGISTRAZIONE
-// ============================================
-app.post('/api/auth/register', async (req, res) => {
-    try {
-        const result = await userDB.register(req.body);
-        if (result.success) {
-            res.status(201).json(result);
-        } else {
-            res.status(400).json(result);
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-app.post('/api/auth/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const result = await userDB.login(email, password);
-        if (result.success) {
-            res.json(result);
-        } else {
-            res.status(401).json(result);
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-app.get('/api/auth/profile/:id', async (req, res) => {
-    try {
-        const user = userDB.getUserById(req.params.id);
-        if (!user) {
-            return res.status(404).json({ success: false, error: 'Utente non trovato' });
-        }
-        res.json({
-            success: true,
-            user: {
-                id: user.id,
-                email: user.email,
-                nome: user.nome,
-                cognome: user.cognome,
-                ruolo: user.ruolo,
-                wallet: user.wallet,
-                stats: user.stats
-            }
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-app.get('/api/auth/stats', async (req, res) => {
-    try {
-        const stats = userDB.getStats();
-        res.json({ success: true, stats });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-app.get('/api/auth/wallet/:id', async (req, res) => {
-    try {
-        const wallet = userDB.getWallet(req.params.id);
-        if (!wallet) {
-            return res.status(404).json({ success: false, error: 'Wallet non trovato' });
-        }
-        res.json({ success: true, wallet });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// ============================================
-// 📊 DASHBOARD
-// ============================================
-app.get('/api/dashboard', async (req, res) => {
-    try {
-        let plants = [];
-        if (fs.existsSync(PLANTS_DB)) {
-            plants = JSON.parse(fs.readFileSync(PLANTS_DB, 'utf8'));
-        }
-        
-        res.json({
-            success: true,
-            dashboard: {
-                total_plants: plants.length,
-                species_by_era: {
-                    '-3000': plants.filter(p => p.year == -3000).length,
-                    1500: plants.filter(p => p.year == 1500).length,
-                    1800: plants.filter(p => p.year == 1800).length,
-                    2124: plants.filter(p => p.year == 2124).length
-                },
-                recent: plants.slice(-5)
-            }
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// ============================================
-// 🚀 AVVIA IL SERVER
-// ============================================
+// Avvia il server
 app.listen(port, () => {
-    console.log(`🚀 Pytho Temporal su porta ${port}`);
-    console.log(`👽 Macchina del tempo attiva!`);
-    console.log(`🛸 http://localhost:${port}/temporal`);
-    console.log(`📊 http://localhost:${port}/api/dashboard`);
-    console.log(`🪨 Minerali: http://localhost:${port}/api/minerals/all`);
-    console.log(`🙏 Orti Francescani: http://localhost:${port}/api/orti-francescani`);
-});
-
-// ============================================
-// 👛 ROTTE WALLET
-// ============================================
-
-// Aggiungi MYZ al wallet
-app.post('/api/auth/wallet/myz/add', async (req, res) => {
-    try {
-        const { userId, amount } = req.body;
-        if (!userId || !amount) {
-            return res.status(400).json({
-                success: false,
-                error: 'userId e amount sono richiesti'
-            });
-        }
-        const user = userDB.addMYZ(userId, amount);
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                error: 'Utente non trovato'
-            });
-        }
-        res.json({
-            success: true,
-            message: `✅ ${amount} MYZ aggiunti al wallet`,
-            wallet: user.wallet
-        });
-    } catch (error) {
-        console.error('❌ Errore aggiunta MYZ:', error);
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// Aggiungi XMR al wallet
-app.post('/api/auth/wallet/xmr/add', async (req, res) => {
-    try {
-        const { userId, amount } = req.body;
-        if (!userId || !amount) {
-            return res.status(400).json({
-                success: false,
-                error: 'userId e amount sono richiesti'
-            });
-        }
-        const user = userDB.addXMR(userId, amount);
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                error: 'Utente non trovato'
-            });
-        }
-        res.json({
-            success: true,
-            message: `✅ ${amount} XMR aggiunti al wallet`,
-            wallet: user.wallet
-        });
-    } catch (error) {
-        console.error('❌ Errore aggiunta XMR:', error);
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// ============================================
-// 👛 ROTTE WALLET XMR E MYZ
-// ============================================
-
-// Genera indirizzo wallet
-function generateWalletAddress(currency) {
-    const crypto = require('crypto');
-    const prefix = currency === 'MYZ' ? 'myz' : 'xmr';
-    return `${prefix}_${crypto.randomBytes(20).toString('hex')}`;
-}
-
-// Ottieni wallet utente
-app.get('/api/wallet/:userId', async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const user = userDB.getUserById(userId);
-        
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                error: 'Utente non trovato'
-            });
-        }
-        
-        res.json({
-            success: true,
-            wallet: user.wallet
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// Crea un nuovo pagamento MYZ
-app.post('/api/payment/myz/create', async (req, res) => {
-    try {
-        const { userId, amount, description } = req.body;
-        const user = userDB.getUserById(userId);
-        
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                error: 'Utente non trovato'
-            });
-        }
-        
-        const payment = {
-            id: `pay_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
-            userId: userId,
-            amount: amount || 0,
-            currency: 'MYZ',
-            description: description || 'Pagamento MYZ',
-            address: user.wallet.myz.address,
-            status: 'pending',
-            createdAt: new Date().toISOString()
-        };
-        
-        // Salva il pagamento (in un file o database)
-        // Per ora lo salviamo in un array
-        if (!global.payments) global.payments = [];
-        global.payments.push(payment);
-        
-        res.json({
-            success: true,
-            payment: payment,
-            message: '✅ Pagamento MYZ creato con successo!'
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// Crea un nuovo pagamento XMR
-app.post('/api/payment/xmr/create', async (req, res) => {
-    try {
-        const { userId, amount, description } = req.body;
-        const user = userDB.getUserById(userId);
-        
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                error: 'Utente non trovato'
-            });
-        }
-        
-        const payment = {
-            id: `pay_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
-            userId: userId,
-            amount: amount || 0,
-            currency: 'XMR',
-            description: description || 'Pagamento XMR',
-            address: user.wallet.xmr.address,
-            status: 'pending',
-            createdAt: new Date().toISOString()
-        };
-        
-        if (!global.payments) global.payments = [];
-        global.payments.push(payment);
-        
-        res.json({
-            success: true,
-            payment: payment,
-            message: '✅ Pagamento XMR creato con successo!'
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// Aggiorna stato pagamento
-app.put('/api/payment/:paymentId/status', async (req, res) => {
-    try {
-        const { paymentId } = req.params;
-        const { status } = req.body;
-        
-        if (!global.payments) {
-            return res.status(404).json({
-                success: false,
-                error: 'Nessun pagamento trovato'
-            });
-        }
-        
-        const payment = global.payments.find(p => p.id === paymentId);
-        if (!payment) {
-            return res.status(404).json({
-                success: false,
-                error: 'Pagamento non trovato'
-            });
-        }
-        
-        payment.status = status;
-        payment.updatedAt = new Date().toISOString();
-        
-        // Se il pagamento è completato, aggiungi il saldo al wallet dell'utente
-        if (status === 'completed') {
-            const user = userDB.getUserById(payment.userId);
-            if (user) {
-                if (payment.currency === 'MYZ') {
-                    user.wallet.myz.balance += payment.amount;
-                    user.stats.myz_guadagnati += payment.amount;
-                } else if (payment.currency === 'XMR') {
-                    user.wallet.xmr.balance += payment.amount;
-                }
-                user.stats.transazioni += 1;
-                userDB.saveUsers();
-            }
-        }
-        
-        res.json({
-            success: true,
-            payment: payment,
-            message: '✅ Stato pagamento aggiornato con successo!'
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-// Ottieni tutti i pagamenti di un utente
-app.get('/api/payments/:userId', async (req, res) => {
-    try {
-        const { userId } = req.params;
-        
-        if (!global.payments) {
-            return res.json({
-                success: true,
-                payments: [],
-                total: 0
-            });
-        }
-        
-        const userPayments = global.payments.filter(p => p.userId === userId);
-        
-        res.json({
-            success: true,
-            payments: userPayments,
-            total: userPayments.length
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
+    console.log('🚀 Pytho Temporal su porta ' + port);
+    console.log('👽 Macchina del tempo attiva!');
+    console.log('🛸 http://localhost:' + port + '/temporal');
+    console.log('📊 http://localhost:' + port + '/api/dashboard');
 });
