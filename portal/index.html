@@ -264,3 +264,27 @@
     <script src="js/app.js"></script>
 </body>
 </html>
+        <!-- Wallet Section -->
+        <div class="wallet-section">
+            <h2>👛 Il Tuo Wallet</h2>
+            <div class="wallet-grid">
+                <div class="wallet-card myz">
+                    <div class="wallet-icon">🪙</div>
+                    <div class="wallet-info">
+                        <span class="wallet-currency">MYZ</span>
+                        <span class="wallet-balance" id="myzBalance">0.00</span>
+                        <span class="wallet-address" id="myzAddress">-</span>
+                    </div>
+                    <button onclick="createPayment(10, 'Pagamento MYZ')" class="btn-small">💰 Crea Pagamento</button>
+                </div>
+                <div class="wallet-card xmr">
+                    <div class="wallet-icon">🔶</div>
+                    <div class="wallet-info">
+                        <span class="wallet-currency">XMR</span>
+                        <span class="wallet-balance" id="xmrBalance">0.0000</span>
+                        <span class="wallet-address" id="xmrAddress">-</span>
+                    </div>
+                    <button onclick="createXMRPayment(0.01, 'Pagamento XMR')" class="btn-small">💰 Crea Pagamento</button>
+                </div>
+            </div>
+        </div>

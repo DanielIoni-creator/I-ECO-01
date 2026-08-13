@@ -404,3 +404,133 @@ window.registerComune = registerComune;
 window.toggleLogin = toggleLogin;
 window.switchAuth = switchAuth;
 window.logout = logout;
+
+// ============================================
+// 👛 FUNZIONI WALLET
+// ============================================
+
+// Ottieni il wallet dell'utente
+async function getWallet(userId) {
+    try {
+        const response = await fetch(`/api/wallet/${userId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            updateWalletUI(data.wallet);
+            return data.wallet;
+        }
+        return null;
+    } catch (error) {
+        console.error('❌ Errore recupero wallet:', error);
+        return null;
+    }
+}
+
+// Aggiorna UI del wallet
+function updateWalletUI(wallet) {
+    if (wallet) {
+        document.getElementById('myzBalance').textContent = `${wallet.myz.balance.toFixed(2)} MYZ`;
+        document.getElementById('xmrBalance').textContent = `${wallet.xmr.balance.toFixed(4)} XMR`;
+        
+        // Salva nel localStorage
+        localStorage.setItem('myzBalance', wallet.myz.balance);
+        localStorage.setItem('xmrBalance', wallet.xmr.balance);
+    }
+}
+
+// Crea un pagamento MYZ
+async function createPayment(amount, description = 'Pagamento MYZ') {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        alert('❌ Devi essere loggato per creare un pagamento');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/payment/myz/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: userId,
+                amount: amount || 10,
+                description: description
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(`✅ Pagamento MYZ creato con successo!\nImporto: ${data.payment.amount} MYZ\nIndirizzo: ${data.payment.address}`);
+            return data.payment;
+        } else {
+            alert(`❌ Errore: ${data.error}`);
+        }
+    } catch (error) {
+        console.error('❌ Errore creazione pagamento:', error);
+        alert('❌ Errore durante la creazione del pagamento');
+    }
+}
+
+// Crea un pagamento XMR
+async function createXMRPayment(amount, description = 'Pagamento XMR') {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        alert('❌ Devi essere loggato per creare un pagamento');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/payment/xmr/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: userId,
+                amount: amount || 0.01,
+                description: description
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(`✅ Pagamento XMR creato con successo!\nImporto: ${data.payment.amount} XMR\nIndirizzo: ${data.payment.address}`);
+            return data.payment;
+        } else {
+            alert(`❌ Errore: ${data.error}`);
+        }
+    } catch (error) {
+        console.error('❌ Errore creazione pagamento XMR:', error);
+        alert('❌ Errore durante la creazione del pagamento XMR');
+    }
+}
+
+// Aggiorna il saldo del wallet
+async function updateBalance(userId) {
+    const wallet = await getWallet(userId);
+    if (wallet) {
+        updateWalletUI(wallet);
+    }
+}
+
+// Carica i pagamenti dell'utente
+async function loadPayments(userId) {
+    try {
+        const response = await fetch(`/api/payments/${userId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const paymentsList = document.getElementById('paymentsList');
+            if (paymentsList) {
+                paymentsList.innerHTML = data.payments.map(p => `
+                    <div class="payment-item ${p.status}">
+                        <span>${p.description}</span>
+                        <span>${p.amount} ${p.currency}</span>
+                        <span class="payment-status">${p.status}</span>
+                    </div>
+                `).join('');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Errore caricamento pagamenti:', error);
+    }
+}

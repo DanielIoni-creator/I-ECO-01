@@ -432,3 +432,201 @@ app.post('/api/auth/wallet/xmr/add', async (req, res) => {
         });
     }
 });
+
+// ============================================
+// 👛 ROTTE WALLET XMR E MYZ
+// ============================================
+
+// Genera indirizzo wallet
+function generateWalletAddress(currency) {
+    const crypto = require('crypto');
+    const prefix = currency === 'MYZ' ? 'myz' : 'xmr';
+    return `${prefix}_${crypto.randomBytes(20).toString('hex')}`;
+}
+
+// Ottieni wallet utente
+app.get('/api/wallet/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = userDB.getUserById(userId);
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: 'Utente non trovato'
+            });
+        }
+        
+        res.json({
+            success: true,
+            wallet: user.wallet
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Crea un nuovo pagamento MYZ
+app.post('/api/payment/myz/create', async (req, res) => {
+    try {
+        const { userId, amount, description } = req.body;
+        const user = userDB.getUserById(userId);
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: 'Utente non trovato'
+            });
+        }
+        
+        const payment = {
+            id: `pay_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+            userId: userId,
+            amount: amount || 0,
+            currency: 'MYZ',
+            description: description || 'Pagamento MYZ',
+            address: user.wallet.myz.address,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
+        
+        // Salva il pagamento (in un file o database)
+        // Per ora lo salviamo in un array
+        if (!global.payments) global.payments = [];
+        global.payments.push(payment);
+        
+        res.json({
+            success: true,
+            payment: payment,
+            message: '✅ Pagamento MYZ creato con successo!'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Crea un nuovo pagamento XMR
+app.post('/api/payment/xmr/create', async (req, res) => {
+    try {
+        const { userId, amount, description } = req.body;
+        const user = userDB.getUserById(userId);
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: 'Utente non trovato'
+            });
+        }
+        
+        const payment = {
+            id: `pay_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+            userId: userId,
+            amount: amount || 0,
+            currency: 'XMR',
+            description: description || 'Pagamento XMR',
+            address: user.wallet.xmr.address,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
+        
+        if (!global.payments) global.payments = [];
+        global.payments.push(payment);
+        
+        res.json({
+            success: true,
+            payment: payment,
+            message: '✅ Pagamento XMR creato con successo!'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Aggiorna stato pagamento
+app.put('/api/payment/:paymentId/status', async (req, res) => {
+    try {
+        const { paymentId } = req.params;
+        const { status } = req.body;
+        
+        if (!global.payments) {
+            return res.status(404).json({
+                success: false,
+                error: 'Nessun pagamento trovato'
+            });
+        }
+        
+        const payment = global.payments.find(p => p.id === paymentId);
+        if (!payment) {
+            return res.status(404).json({
+                success: false,
+                error: 'Pagamento non trovato'
+            });
+        }
+        
+        payment.status = status;
+        payment.updatedAt = new Date().toISOString();
+        
+        // Se il pagamento è completato, aggiungi il saldo al wallet dell'utente
+        if (status === 'completed') {
+            const user = userDB.getUserById(payment.userId);
+            if (user) {
+                if (payment.currency === 'MYZ') {
+                    user.wallet.myz.balance += payment.amount;
+                    user.stats.myz_guadagnati += payment.amount;
+                } else if (payment.currency === 'XMR') {
+                    user.wallet.xmr.balance += payment.amount;
+                }
+                user.stats.transazioni += 1;
+                userDB.saveUsers();
+            }
+        }
+        
+        res.json({
+            success: true,
+            payment: payment,
+            message: '✅ Stato pagamento aggiornato con successo!'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Ottieni tutti i pagamenti di un utente
+app.get('/api/payments/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        
+        if (!global.payments) {
+            return res.json({
+                success: true,
+                payments: [],
+                total: 0
+            });
+        }
+        
+        const userPayments = global.payments.filter(p => p.userId === userId);
+        
+        res.json({
+            success: true,
+            payments: userPayments,
+            total: userPayments.length
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
