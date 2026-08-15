@@ -1,87 +1,80 @@
+/**
+ * 🏭 I-ECO-01 - Escrow Multisig API
+ * Urban Lab - Monero Escrow System
+ */
 
-// ============================================
-// 📝 ROTTE DI REGISTRAZIONE
-// ============================================
-const { UserDatabase } = require('./auth/register');
-const userDB = new UserDatabase();
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const mongoose = require('mongoose');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const winston = require('winston');
 
-// Registrazione utente
-app.post('/api/auth/register', async (req, res) => {
-    try {
-        const result = await userDB.register(req.body);
-        if (result.success) {
-            res.status(201).json(result);
-        } else {
-            res.status(400).json(result);
-        }
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
+// Logger
+const logger = winston.createLogger({
+    level: process.env.LOG_LEVEL || 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+    ),
+    transports: [
+        new winston.transports.File({ filename: 'logs/app.log' }),
+        new winston.transports.Console({ format: winston.format.simple() })
+    ]
 });
 
-// Login utente
-app.post('/api/auth/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const result = await userDB.login(email, password);
-        if (result.success) {
-            res.json(result);
-        } else {
-            res.status(401).json(result);
-        }
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: { origin: process.env.CORS_ORIGIN || '*', methods: ["GET", "POST"] }
 });
 
-// Ottieni profilo utente
-app.get('/api/auth/profile/:id', async (req, res) => {
-    try {
-        const user = userDB.getUserById(req.params.id);
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                error: 'Utente non trovato'
-            });
-        }
-        res.json({
-            success: true,
-            user: {
-                id: user.id,
-                email: user.email,
-                nome: user.nome,
-                cognome: user.cognome,
-                ruolo: user.ruolo,
-                stats: user.stats,
-                createdAt: user.createdAt
-            }
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
+// ---- MIDDLEWARE ----
+app.use(helmet());
+app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ---- CORS custom middleware (opzionale, ma lo teniamo) ----
+app.use(require('./src/middleware/cors'));
+
+// ---- MONGODB ----
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/urbanlab', {
+    dbName: process.env.MONGODB_DB_NAME || 'urbanlab',
+    serverSelectionTimeoutMS: 5000
+})
+.then(() => { logger.info('✅ MongoDB connesso!'); console.log('✅ MongoDB connesso!'); })
+.catch(err => { logger.error('❌ MongoDB errore:', err); console.error('❌ MongoDB errore:', err); });
+
+// ---- ROTTE ESCROW ----
+app.use('/api/escrow', require('./src/routes/escrowRoutes'));
+
+// ---- HEALTH CHECK ----
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        service: 'I-ECO-01',
+        timestamp: new Date().toISOString(),
+        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    });
 });
 
-// Statistiche utenti
-app.get('/api/auth/stats', async (req, res) => {
-    try {
-        const stats = userDB.getStats();
-        res.json({
-            success: true,
-            stats
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
+// ---- WEBSOCKET ----
+io.on('connection', (socket) => {
+    logger.info(`🔌 Client connesso: ${socket.id}`);
+    socket.on('disconnect', () => { logger.info(`🔌 Client disconnesso: ${socket.id}`); });
 });
+
+// ---- AVVIO ----
+const PORT = process.env.PORT || 5002;
+httpServer.listen(PORT, () => {
+    logger.info(`🚀 Server avviato su porta ${PORT}`);
+    console.log(`🚀 Server avviato su porta ${PORT}`);
+    console.log(`   📊 Health: http://localhost:${PORT}/health`);
+    console.log(`   🔐 Escrow: http://localhost:${PORT}/api/escrow`);
+    console.log(`   🔌 WebSocket: ws://localhost:${PORT}`);
+});
+
+module.exports = { app, httpServer, io };
