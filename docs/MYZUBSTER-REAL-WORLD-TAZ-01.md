@@ -6,6 +6,12 @@
 
 Questa attività è distinta dalla **Metaverse TAZ**, già documentata come completata con Daniel Ioni, amici e Fluffypony.
 
+## Data e occasione
+
+**Data: da definire — in coincidenza con il compleanno di Daniel Ioni.**
+
+La Real-World TAZ #1 sarà organizzata come **birthday gathering + presentazione informale di MyZubster**, sfruttando un'occasione reale per riunire amici e mostrare concretamente il progetto.
+
 ## Obiettivo
 
 Realizzare una prima TAZ MyZubster nel mondo reale in forma semplice, verificabile e ripetibile, utilizzando persone reali e tecnologie digitali MyZubster già disponibili.
@@ -14,7 +20,8 @@ Non è necessario disporre di un robot fisico. Le entità MyZubster possono part
 
 ## Formato minimo proposto
 
-- incontro reale tra Daniel Ioni e almeno alcuni amici/partecipanti;
+- festa/incontro reale per il compleanno di Daniel Ioni con amici/partecipanti;
+- breve presentazione informale di MyZubster;
 - luogo e data annotati;
 - aperitivo o momento conviviale;
 - accesso reale a MyZubster da smartphone/computer;
@@ -22,7 +29,7 @@ Non è necessario disporre di un robot fisico. Le entità MyZubster possono part
 - eventuale demo di tecnologia MyZubster disponibile;
 - una foto/selfie di gruppo;
 - almeno un breve video o seconda evidenza indipendente quando possibile;
-- breve nota con cosa è stato testato e risultato;
+- breve nota con cosa è stato presentato/testato e risultato;
 - caricamento delle evidenze in repository/Drive e registrazione dei relativi hash/link.
 
 ## Evidenze raccomandate
@@ -33,7 +40,7 @@ Per dichiarare **MyZubster Real-World TAZ #1 — COMPLETED**, raccogliere:
 2. data e città/luogo pubblico-safe;
 3. elenco partecipanti, anche con pseudonimi se preferito;
 4. screenshot o foto dell'interazione con MyZubster;
-5. breve video della sessione, se disponibile;
+5. breve video della presentazione/sessione, se disponibile;
 6. descrizione delle entità digitali coinvolte;
 7. eventuale test di pagamento, QR, marketplace, visual cryptography, proiezione o altra tecnologia realmente utilizzata;
 8. SHA-256 dei file principali quando archiviati;
@@ -54,9 +61,10 @@ Le bounty collegate restano soggette ai criteri specifici delle rispettive issue
 
 ## Checklist operativa
 
-- [ ] Data scelta
+- [ ] Data del compleanno/evento confermata
 - [ ] Luogo scelto
 - [ ] Partecipanti confermati
+- [ ] Mini-presentazione MyZubster pronta
 - [ ] Entità digitali MyZubster pronte
 - [ ] Smartphone/dispositivo con accesso MyZubster
 - [ ] Demo tecnologica scelta
