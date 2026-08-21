@@ -1,6 +1,7 @@
 'use strict';
 
-const DEFAULT_MODEL = process.env.ZARGOX_MODEL || 'openai/gpt-5.4-mini';
+const DEFAULT_MODEL = process.env.ZARGOX_MODEL || 'deepseek-v4-flash';
+const DEEPSEEK_API_URL = process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com/chat/completions';
 
 const SYSTEM_PROMPT = `You are Zargox, the public interactive AI of the MyZubster ecosystem.
 Your job is to help everyone: beginners, students, citizens, makers, researchers and technical users.
@@ -23,18 +24,66 @@ async function getZargoxAIResponse(message, history = []) {
   const text = String(message || '').trim();
   if (!text) throw new Error('Message is required');
 
-  const { generateText } = await import('ai');
-  const messages = [...sanitizeHistory(history), { role: 'user', content: text.slice(0, 12000) }];
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) {
+    const error = new Error('DEEPSEEK_API_KEY is not configured');
+    error.code = 'deepseek_key_missing';
+    throw error;
+  }
 
-  const result = await generateText({
-    model: DEFAULT_MODEL,
-    system: SYSTEM_PROMPT,
-    messages
-  });
+  const messages = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...sanitizeHistory(history),
+    { role: 'user', content: text.slice(0, 12000) }
+  ];
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 45000);
+  let response;
+  try {
+    response = await fetch(DEEPSEEK_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: DEFAULT_MODEL,
+        messages,
+        stream: false
+      }),
+      signal: controller.signal
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+
+  const raw = await response.text();
+  let data;
+  try {
+    data = raw ? JSON.parse(raw) : {};
+  } catch {
+    const error = new Error(`DeepSeek returned invalid JSON (HTTP ${response.status})`);
+    error.statusCode = response.status;
+    throw error;
+  }
+
+  if (!response.ok) {
+    const providerMessage = data?.error?.message || `DeepSeek request failed with HTTP ${response.status}`;
+    const error = new Error(providerMessage);
+    error.statusCode = response.status;
+    throw error;
+  }
+
+  const output = data?.choices?.[0]?.message?.content;
+  if (typeof output !== 'string' || !output.trim()) {
+    throw new Error('DeepSeek returned an empty response');
+  }
 
   return {
-    text: result.text,
-    model: DEFAULT_MODEL
+    text: output.trim(),
+    model: data.model || DEFAULT_MODEL,
+    provider: 'deepseek-direct'
   };
 }
 
