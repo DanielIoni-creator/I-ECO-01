@@ -19,9 +19,10 @@ module.exports = async function handler(req, res) {
       ok: true,
       name: 'Zargox',
       service: 'MyZubster Public AI',
-      provider: 'vercel-ai-gateway',
+      provider: 'deepseek-direct',
       model: DEFAULT_MODEL,
-      public: true
+      public: true,
+      configured: Boolean(process.env.DEEPSEEK_API_KEY)
     });
   }
 
@@ -45,14 +46,15 @@ module.exports = async function handler(req, res) {
       name: 'Zargox',
       response: result.text,
       model: result.model,
-      provider: 'vercel-ai-gateway',
+      provider: result.provider || 'deepseek-direct',
       timestamp: new Date().toISOString()
     });
   } catch (error) {
     console.error('Zargox AI error:', error);
-    return res.status(500).json({
+    const missingKey = error && error.code === 'deepseek_key_missing';
+    return res.status(missingKey ? 503 : 500).json({
       ok: false,
-      error: 'Zargox AI is temporarily unavailable',
+      error: missingKey ? 'DeepSeek API is not configured' : 'Zargox AI is temporarily unavailable',
       detail: process.env.NODE_ENV === 'production' ? undefined : error.message
     });
   }
