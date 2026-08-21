@@ -2,6 +2,18 @@
   "version": 2,
   "routes": [
     {
+      "src": "/zargox",
+      "dest": "/api/zargox-page.js"
+    },
+    {
+      "src": "/api/zargox",
+      "dest": "/api/zargox.js"
+    },
+    {
+      "src": "/api/zargox/(.*)",
+      "dest": "/api/zargox.js"
+    },
+    {
       "src": "/chat",
       "dest": "/api/index.js"
     },
