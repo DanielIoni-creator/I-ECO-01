@@ -228,10 +228,12 @@ La Metaverse TAZ completata è una **evidenza storica e progettuale**, ma **non 
 
 La presenza pubblica di MyZubster sta iniziando a essere intercettata anche da canali esterni e strumenti di discovery dedicati agli sviluppatori.
 
-- **KMP Weekly** — ha indicizzato il contenuto **“NFC Payments in MyZubster: A Complete Guide”**, portando MyZubster all'interno di una community tecnica focalizzata su Kotlin Multiplatform / Compose.
-- **Open Issue Map** — sta indicizzando issue pubbliche di **MyZubster-Ecosystem/MyZubsterGateway**, incluse attività come **Security audit checklist for the gateway** e **Collaborative verification system for mapping data**.
+- **KMP Weekly** — ha indicizzato **“📱 NFC Payments in MyZubster: A Complete Guide”** nella propria newsletter/community dedicata a Kotlin Multiplatform e Compose: https://kmpweekly.com/
+- **Open Issue Map** — indicizza issue pubbliche di **MyZubster-Ecosystem/MyZubsterGateway**, tra cui:
+  - **[Free] Security audit checklist for the gateway**: https://openissuemap.com/issues/MyZubster-Ecosystem/MyZubsterGateway/80
+  - **[Free] Collaborative verification system for mapping data**: https://openissuemap.com/issues/MyZubster-Ecosystem/MyZubsterGateway/71
 
-Queste indicizzazioni sono utili perché aumentano la discoverability del progetto fuori dai canali proprietari e rendono ancora più importante mantenere **issue, reward, stato dei task, criteri di accettazione e documentazione** chiari e aggiornati.
+Queste indicizzazioni aumentano la discoverability del progetto fuori dai canali proprietari e rendono ancora più importante mantenere **issue, reward, stato dei task, criteri di accettazione e documentazione** chiari e aggiornati.
 
 > Nota: queste citazioni rappresentano discovery/indicizzazione esterna osservata e non endorsement formale del progetto.
 
