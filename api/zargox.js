@@ -22,7 +22,9 @@ module.exports = async function handler(req, res) {
       provider: 'deepseek-direct',
       model: DEFAULT_MODEL,
       public: true,
-      configured: Boolean(process.env.DEEPSEEK_API_KEY)
+      configured: Boolean(process.env.DEEPSEEK_API_KEY),
+      live_context: String(process.env.ZARGOX_LIVE_CONTEXT_ENABLED || 'true').toLowerCase() !== 'false',
+      live_sources: ['Wikipedia', 'GDELT (time-sensitive queries)']
     });
   }
 
@@ -47,6 +49,9 @@ module.exports = async function handler(req, res) {
       response: result.text,
       model: result.model,
       provider: result.provider || 'deepseek-direct',
+      live_context_used: Boolean(result.liveContextUsed),
+      live_sources: result.liveSources || [],
+      live_context_errors: result.liveContextErrors || [],
       timestamp: new Date().toISOString()
     });
   } catch (error) {
